@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hygieconnect{% endblock %}
+{% block stylesheets %} 
+<link rel="stylesheet" href="{{ asset('css/stylehome.css') }}"> 
+{% endblock %}
+{% block body %}
+<div class="ag-maecenas-block">
+  <div class="ag-maecenas_title">
+    <div class="ag-format-container">
+      HygieConnect
+    </div>
+  </div>
+  <div class="ag-format-container">
+    <section class="ag-maecenas_box">
+      <article class="ag-maecenas_item">
+        <div class="ag-maecenas_descr">
+          <div class="ag-maecenas_title-item">
+            Formations et audits
+          </div>
+          <div class="ag-maecenas_tagline-item">
+            Consultez et choisissez facilement
+          </div>
+          <ul class="ag-requirement_list">
+            <li class="ag-requirement_item">
+              Accès à toutes les formations et audits disponibles
+            </li>
+            <li class="ag-requirement_item">
+              Tarifs indicatifs affichés pour chaque service
+            </li>
+            <li class="ag-requirement_item">
+              Description détaillée des programmes et contenus
+            </li>
+            <li class="ag-requirement_item">
+              Filtrage par type de formation ou audit
+            </li>
+            <li class="ag-requirement_item">
+              Informations claires pour planifier vos besoins
+            </li>
+          </ul>
+        </div>
+      <div class="ag-maecenas_img-box">
+    <img src="{{ asset('images/formateur.jpg') }}" alt="Formateur" class="svg-maecenas_img">
+    </div>
+
+  
+      </article>
+    </section>
+  </div>
+</div>
+            <!-- Services Section -->
+            <section id="services" class="py-5 bg-light">
+                <div class="container">
+                <div class="one">
+              <h1>Nos Formations et prestations</h1>
+            </div>
+                    <div class="row g-4">
+
+            {% set formations = [
+                {'icon':'fas fa-water','title':'Prévention et traitement des légionelles','desc':'Gestion de la qualité des eaux sanitaires'},
+                {'icon':'fas fa-swimming-pool','title':'Qualité des eaux de piscines','desc':'Contrôle et traitement des piscines'},
+                {'icon':'fas fa-search','title':'Auto diagnostic et audit interne','desc':'Formation complète sur audits internes'},
+                {'icon':'fas fa-tools','title':'Maintenance préventive par secteur','desc':'Cuisine, restaurant, locaux techniques...'},
+                {'icon':'fas fa-bed','title':'Hygiène des chambres','desc':'Hébergement et propreté optimale'},
+                {'icon':'fas fa-spa','title':'Bonnes pratiques d’hygiène SPA / thalasso','desc':'Hydrothérapie et centres SPA'},
+                {'icon':'fas fa-utensils','title':'Hygiène de base BPH restauration collective','desc':'6 modules sur l’hygiène et HACCP'},
+                {'icon':'fas fa-book','title':'Guide des BPTE spécifique','desc':'Mise en place des bonnes pratiques de traitement'},
+                {'icon':'fas fa-sync-alt','title':'Mise à jour du Guide BPT','desc':'Travaux de rénovation ou modification des installations'},
+                {'icon':'fas fa-vials','title':'Audit biotechnique légionelles','desc':'Prévention et contrôle des risques'},
+                {'icon':'fas fa-apple-alt','title':'Audit en hygiène alimentaire','desc':'Contrôle des pratiques alimentaires'},
+                {'icon':'fas fa-bolt','title':'Diagnostic technique des installations','desc':'Eau chaude, froide et air conditionné'}
+            ] %}
+
+            {% for f in formations %}
+            <div class="col-md-4 fade-up">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <i class="{{ f.icon }} icon mb-3"></i>
+                        <h5 class="card-title">{{ f.title }}</h5>
+                        <p class="card-text">{{ f.desc }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-center bg-primary text-white">
+    <div class="container fade-up">
+        <h2 class="fw-bold">Prêt à améliorer l’hygiène et la sécurité de vos installations ?</h2>
+        <p class="lead mb-4">Contactez notre formateur expert pour organiser votre formation ou audit personnalisé.</p>
+        <a href="#contact" class="btn btn btn-lg">Contactez-nous</a>
+    </div>
+</section>
+
+
+<!-- Scroll Animation Script -->
+<script>
+    const faders = document.querySelectorAll('.fade-up');
+    const appearOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+
+    const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+            if(!entry.isIntersecting) return;
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+        });
+    }, appearOptions);
+
+    faders.forEach(fader => { appearOnScroll.observe(fader); });
+    (function ($) {
+  $(function () {
+
+    
+
+  });
+})(jQuery);
+</script>
+
+
+
+{% endblock %}
