@@ -1,19 +1,86 @@
 {% block footer %}
-    <div class="container">
-        <footer class="py-3 my-4">
-            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-                <li class="nav-item">
-                
-                </li>
-                <li class="nav-item">
-                   
-                </li>
-                <li class="nav-item">
-                   
-                </li>
-            </ul>
-            <p class="text-center text-body-secondary">
-                © 2025 Hygieconnect</p>
-        </footer>
+<footer class="footer-glacial mt-5">
+    <div class="container py-5">
+        <div class="row align-items-center text-center text-md-start">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="fw-bold text-primary mb-2">Hygieconnect</h5>
+                <p class="text-muted small mb-0">
+                    Des solutions d’hygiène et de prévention innovantes, au service de la qualité et du bien-être.
+                </p>
+            </div>
+
+            <div class="col-md-4 mb-3 mb-md-0">
+                <ul class="list-unstyled d-flex justify-content-center justify-content-md-start gap-4 mb-0">
+                    <li><a href="#services" class="footer-link">Formations</a></li>
+                    <li><a href="#about" class="footer-link">À propos</a></li>
+                    <li><a href="#contact" class="footer-link">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 text-center text-md-end">
+                <div class="social-icons d-flex justify-content-center justify-content-md-end gap-3">
+                    <a href="" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://fr.linkedin.com/posts/the-z-h%C3%B4tel-sfax_toujours-au-top-de-lhygi%C3%A8ne-l%C3%A9quipe-activity-7373704876507226112-zw7W" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4 opacity-50">
+
+        <div class="text-center">
+            <p class="text-muted small mb-0">© 2025 Hygieconnect — Tous droits réservés</p>
+        </div>
     </div>
+</footer>
+
+<style>
+.footer-glacial {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(0, 123, 255, 0.15);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    color: #0d1b2a;
+}
+
+/* Liens */
+.footer-link {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #0d6efd;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Icônes réseaux */
+.social-link {
+    color: #0d6efd;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 10px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: #0d6efd;
+    color: white;
+    transform: translateY(-3px);
+}
+</style>
 {% endblock %}

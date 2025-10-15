@@ -2,7 +2,7 @@
 
 {% block title %}Hygieconnect{% endblock %}
 {% block stylesheets %} 
-<link rel="stylesheet" href="{{ asset('css/stylehome.css') }}"> 
+<link rel="stylesheet" href="{{ asset('css/home.css') }}"> 
 {% endblock %}
 {% block body %}
 <div class="ag-maecenas-block">
@@ -48,44 +48,78 @@
     </section>
   </div>
 </div>
-            <!-- Services Section -->
-            <section id="services" class="py-5 bg-light">
-                <div class="container">
-                <div class="one">
-              <h1>Nos Formations et prestations</h1>
-            </div>
-                    <div class="row g-4">
+      <!-- Services Section -->
+<section id="services" class="py-5">
+    <div class="container">
+        <div class="one">
+            <h1>Nos Formations et prestations</h1>
+        </div>
 
-            {% set formations = [
-                {'icon':'fas fa-water','title':'Prévention et traitement des légionelles','desc':'Gestion de la qualité des eaux sanitaires'},
-                {'icon':'fas fa-swimming-pool','title':'Qualité des eaux de piscines','desc':'Contrôle et traitement des piscines'},
-                {'icon':'fas fa-search','title':'Auto diagnostic et audit interne','desc':'Formation complète sur audits internes'},
-                {'icon':'fas fa-tools','title':'Maintenance préventive par secteur','desc':'Cuisine, restaurant, locaux techniques...'},
-                {'icon':'fas fa-bed','title':'Hygiène des chambres','desc':'Hébergement et propreté optimale'},
-                {'icon':'fas fa-spa','title':'Bonnes pratiques d’hygiène SPA / thalasso','desc':'Hydrothérapie et centres SPA'},
-                {'icon':'fas fa-utensils','title':'Hygiène de base BPH restauration collective','desc':'6 modules sur l’hygiène et HACCP'},
-                {'icon':'fas fa-book','title':'Guide des BPTE spécifique','desc':'Mise en place des bonnes pratiques de traitement'},
-                {'icon':'fas fa-sync-alt','title':'Mise à jour du Guide BPT','desc':'Travaux de rénovation ou modification des installations'},
-                {'icon':'fas fa-vials','title':'Audit biotechnique légionelles','desc':'Prévention et contrôle des risques'},
-                {'icon':'fas fa-apple-alt','title':'Audit en hygiène alimentaire','desc':'Contrôle des pratiques alimentaires'},
-                {'icon':'fas fa-bolt','title':'Diagnostic technique des installations','desc':'Eau chaude, froide et air conditionné'}
-            ] %}
+        {% set formations = [
+            {'icon':'fas fa-water','title':'Prévention et traitement des légionelles','desc':'Gestion de la qualité des eaux sanitaires'},
+            {'icon':'fas fa-swimming-pool','title':'Qualité des eaux de piscines','desc':'Contrôle et traitement des piscines'},
+            {'icon':'fas fa-search','title':'Auto diagnostic et audit interne','desc':'Formation complète sur audits internes'},
+            {'icon':'fas fa-tools','title':'Maintenance préventive par secteur','desc':'Cuisine, restaurant, locaux techniques...'},
+            {'icon':'fas fa-bed','title':'Hygiène des chambres','desc':'Hébergement et propreté optimale'},
+            {'icon':'fas fa-spa','title':'Bonnes pratiques d’hygiène SPA / thalasso','desc':'Hydrothérapie et centres SPA'},
+            {'icon':'fas fa-utensils','title':'Hygiène de base BPH restauration collective','desc':'6 modules sur l’hygiène et HACCP'},
+            {'icon':'fas fa-book','title':'Guide des BPTE spécifique','desc':'Mise en place des bonnes pratiques de traitement'},
+            {'icon':'fas fa-sync-alt','title':'Mise à jour du Guide BPT','desc':'Travaux de rénovation ou modification des installations'},
+            {'icon':'fas fa-vials','title':'Audit biotechnique légionelles','desc':'Prévention et contrôle des risques'},
+            {'icon':'fas fa-apple-alt','title':'Audit en hygiène alimentaire','desc':'Contrôle des pratiques alimentaires'},
+            {'icon':'fas fa-bolt','title':'Diagnostic technique des installations','desc':'Eau chaude, froide et air conditionné'}
+        ] %}
 
+        <div class="row g-4" id="formations-container">
+            {% set initial_limit = 6 %}
             {% for f in formations %}
-            <div class="col-md-4 fade-up">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <i class="{{ f.icon }} icon mb-3"></i>
-                        <h5 class="card-title">{{ f.title }}</h5>
-                        <p class="card-text">{{ f.desc }}</p>
+                <div class="col-md-4 fade-up formation-item {% if loop.index > initial_limit %}d-none{% endif %}">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <i class="{{ f.icon }} icon mb-3"></i>
+                            <h5 class="card-title">{{ f.title }}</h5>
+                            <p class="card-text">{{ f.desc }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
+        </div>
 
+        <div class="text-center mt-3">
+            <button id="toggle-btn" class="btn btn-primary">+ Voir plus</button>
         </div>
     </div>
 </section>
+
+<!-- CSS -->
+<style>
+.formation-item {
+    transition: all 0.3s ease-in-out;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggle-btn');
+    const allItems = document.querySelectorAll('.formation-item');
+    const initialLimit = 6;
+
+    toggleBtn.addEventListener('click', function() {
+        const hiddenItems = Array.from(allItems).slice(initialLimit);
+
+        if (toggleBtn.textContent.includes('+')) {
+            // Afficher le reste
+            hiddenItems.forEach(item => item.classList.remove('d-none'));
+            toggleBtn.textContent = '- Voir moins';
+        } else {
+            // Replier
+            hiddenItems.forEach(item => item.classList.add('d-none'));
+            toggleBtn.textContent = '+ Voir plus';
+        }
+    });
+});
+</script>
 
 <!-- Call to Action -->
 <section class="py-5 text-center bg-primary text-white">

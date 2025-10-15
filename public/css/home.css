@@ -6,7 +6,7 @@ body {
     line-height: 1.6;
     color: #333;
     scroll-behavior: smooth;
-    background-color: #f8f9fa;
+    background-color: #fff;
 }
 h2, h3, h4, h5 {
     font-family: 'Montserrat', sans-serif;
@@ -235,22 +235,7 @@ body {
     -ms-flex-order: 2;
     order: 2;
   }
-  .ag-maecenas_img-box {
-    -webkit-flex: 0 0 100%;
-    -ms-flex: 0 0 100%;
-    flex: 0 0 100%;
-    -webkit-box-flex: 0;
-    -moz-box-flex: 0;
-    -webkit-box-ordinal-group: 2;
-    -moz-box-ordinal-group: 2;
-    -ms-flex-order: 1;
-    order: 1;
 
-    height: 200px;
-    width: 100%;
-    min-width: 150px;
-    padding: 0;
-  }
 }
 
 @media only screen and (max-width: 639px) {
@@ -340,6 +325,11 @@ body {
 /* =========================
    Cards Modernes / Services
 ========================= */
+
+#services {
+background-color: #FFF;
+}
+
 #services .card {
     border: none;
     border-radius: 20px;
@@ -481,6 +471,7 @@ h1 em {
   margin-left: -50px;
   background-color: #0d6efd;
 }
+
 
 /* =========================
    Animations on Scroll (fade-up)
