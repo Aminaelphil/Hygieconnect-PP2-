@@ -1,0 +1,17 @@
+.facture-card {
+    background: #f9fcff;
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem;
+}
+.btn-lg {
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+.btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}

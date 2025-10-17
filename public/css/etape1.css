@@ -1,0 +1,31 @@
+/* Gradient bouton moderne */
+.btn-gradient {
+    background: linear-gradient(135deg, #4e9af1, #a1c4fd);
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #3a7bd5, #6fb1fc);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Input focus animé */
+.form-control:focus, .form-select:focus {
+    border-color: #4e9af1;
+    box-shadow: 0 0 0 0.2rem rgba(78, 154, 241, 0.25);
+}
+
+/* Card moderne */
+.card {
+    background: #ffffffcc;
+    backdrop-filter: blur(15px);
+}
+
+/* Responsive padding */
+@media (max-width: 576px) {
+    .card {
+        padding: 2rem 1.5rem;
+    }
+}

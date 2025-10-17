@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Devis N°{{ demande.id }}{% endblock %}
+
+{% block body %}
+<div style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
+
+    <!-- Header -->
+    <div style="display: table; width: 100%; margin-bottom: 30px;">
+        <div style="display: table-cell;">
+            <h2 style="color: #007bff;">HygieConnect</h2>
+            <p>Service de prestations personnalisées</p>
+        </div>
+        <div style="display: table-cell; text-align: right;">
+            <p><strong>Devis N°:</strong> #{{ demande.id }}</p>
+            <p><strong>Date :</strong> {{ "now"|date("d/m/Y") }}</p>
+            {% if demande.dateDebut and demande.dateFin %}
+                <p><strong>Période :</strong> {{ demande.dateDebut|date('d/m/Y') }} - {{ demande.dateFin|date('d/m/Y') }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Infos demandeur -->
+    <div style="margin-bottom: 20px;">
+        <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur|capitalize ?: '-' }}</p>
+        <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation ?: '-' }}</p>
+        <p><strong>Informations supplémentaires :</strong> {{ demande.infossupplementaires ?: '-' }}</p>
+    </div>
+
+    <!-- Tableau prestations -->
+    {% if demande.prestations|length > 0 %}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #ccc; padding: 8px;">Prestation</th>
+                <th style="border: 1px solid #ccc; padding: 8px;">Description</th>
+                <th style="border: 1px solid #ccc; padding: 8px; text-align:center;">Durée</th>
+                <th style="border: 1px solid #ccc; padding: 8px; text-align:right;">Prix (DT)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestation in demande.prestations %}
+            <tr>
+                <td style="border: 1px solid #ccc; padding: 8px;">{{ prestation.titre }}</td>
+                <td style="border: 1px solid #ccc; padding: 8px;">{{ prestation.description ?: '-' }}</td>
+                <td style="border: 1px solid #ccc; padding: 8px; text-align:center;">{{ prestation.duree ?: '-' }}</td>
+                <td style="border: 1px solid #ccc; padding: 8px; text-align:right;">{{ prestation.prix ?: '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="border: 1px solid #ccc; padding: 8px; text-align:right;"><strong>Total estimé :</strong></td>
+                <td style="border: 1px solid #ccc; padding: 8px; text-align:right;"><strong>{{ total }} DT</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    {% else %}
+        <p>Aucune prestation sélectionnée.</p>
+    {% endif %}
+
+    <p style="font-size: 12px; color: #555;">Note : Ce devis est estimatif et peut varier selon la disponibilité et la complexité des prestations.</p>
+</div>
+{% endblock %}

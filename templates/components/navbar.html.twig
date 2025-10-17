@@ -9,7 +9,7 @@
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
             <i class="bi bi-droplet-fill text-primary fs-3 me-2"></i>
-            <span class="fw-bold text-primary">HygieConnect</span>
+            <span class="fw-bold text-primary" href="{{ path('app_home') }}">HygieConnect</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -20,11 +20,12 @@
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Accueil</a>
+                    <a class="nav-link active" href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Formations</a>
+                    <a class="nav-link" href="{{ path('app_formations') }}">Formations</a>
                 </li>
+
                 <li class="nav-item">
                     <a class="nav-link" href="#">Audits</a>
                 </li>
@@ -32,7 +33,7 @@
                     <a class="nav-link" href="#">Contact</a>
                 </li>
                 <li class="nav-item ms-2">
-                    <a class="btn btn-primary btn-sm px-4" href="#">Demande de service</a>
+                    <a class="btn btn-primary btn-sm px-4" href="{{ path('app_demande_new')}}">Demande de service</a>
                 </li>
             </ul>
         </div>

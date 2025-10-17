@@ -48,6 +48,12 @@ class Demande
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $datedemande = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $naturedemandeur = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $adresseprestation = null;
+
     public function __construct()
     {
         $this->prestations = new ArrayCollection();
@@ -162,6 +168,30 @@ class Demande
     public function setDatedemande(?\DateTimeImmutable $datedemande): static
     {
         $this->datedemande = $datedemande;
+
+        return $this;
+    }
+
+    public function getNaturedemandeur(): ?string
+    {
+        return $this->naturedemandeur;
+    }
+
+    public function setNaturedemandeur(?string $naturedemandeur): static
+    {
+        $this->naturedemandeur = $naturedemandeur;
+
+        return $this;
+    }
+
+    public function getAdresseprestation(): ?string
+    {
+        return $this->adresseprestation;
+    }
+
+    public function setAdresseprestation(?string $adresseprestation): static
+    {
+        $this->adresseprestation = $adresseprestation;
 
         return $this;
     }

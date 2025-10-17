@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos Formations{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/formation.css') }}">
+{% endblock %}
+{% block body %}
+<!-- Hero Section -->
+<section class="hero d-flex align-items-center text-center py-5 position-relative" 
+         style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url('{{ asset('images/back2.jpg') }}'); 
+                background-size: cover; background-position: center; background-attachment: fixed; color: white; min-height: 60vh;">
+  <div class="container py-5">
+    <h1 class="display-4 fw-bold mb-3" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.7);">
+      Formations Professionnelles
+    </h1>
+    <p class="lead mb-4" style="text-shadow: 1px 1px 4px rgba(0,0,0,0.7);">
+      Développez vos compétences avec nos programmes conçus par l'expert du terrain.
+    </p>
+    <a href="{{ path('app_demande_new') }}" class="btn btn-gradient btn-lg rounded-pill shadow-lg fw-semibold px-4 py-2">
+      Demander une formation
+    </a>
+  </div>
+</section>
+
+<!-- Formations Cards -->
+<section id="formations" class="py-5">
+   <div class="container">
+
+
+
+  <div class="row g-4">
+    {% set formations = [
+      {'titre': 'Prévention et traitement des légionelles', 'description': 'Gestion de la qualité des eaux sanitaires.', 'jours': 3, 'image': 'formation1.jpg'},
+      {'titre': 'Gestion de la qualité des eaux de piscines', 'description': 'Formation sur la réglementation et la qualité de l’eau.', 'jours': 2, 'note': '3 j avec formation pratique sur site', 'image': 'formation2.jpg'},
+      {'titre': 'Auto diagnostic et audit interne', 'description': 'Apprenez à évaluer vos installations et procédures.', 'jours': 3, 'image': 'formation3.jpg'},
+      {'titre': 'Maintenance préventive par secteur spécifique', 'description': 'Cuisines, restaurants, locaux techniques.', 'jours': 2, 'image': 'formation4.jpg'},
+      {'titre': 'Hygiène des chambres (hébergement)', 'description': 'Renforcez la propreté et la sécurité sanitaire.', 'jours': 1, 'note': '1/2 journée par groupe', 'image': 'formation5.jpg'},
+      {'titre': 'Bonnes pratiques d\'hygiène dans les centres SPA / Thalassothérapie', 'description': 'Optimisez vos protocoles sanitaires dans les centres de bien-être.', 'jours': 2, 'image': 'formation6.jpg'},
+      {'titre': 'Hygiène de base (BPH) dans la restauration collective', 'description': 'Formation complète en 6 modules couvrant tous les aspects de l’hygiène alimentaire.', 'jours': 3, 'modules': [
+        'Hygiène du personnel et du comportement',
+        'Hygiène des surfaces et des équipements',
+        'Contrôle et gestion des matières premières',
+        'Hygiène des préparations et organisation du travail',
+        'Hygiène des 3 buffets et maîtrise des points critiques',
+        'Prévention des TIAC par le système HACCP et méthode des 5 M'
+      ], 'image': 'back1.jpg'}
+    ] %}
+
+{% for formation in formations %}
+  {% set isBPH = formation.titre == 'Hygiène de base (BPH) dans la restauration collective' %}
+  <div class="{{ isBPH ? 'col-12 col-lg-8 offset-lg-2' : 'col-md-6 col-lg-4' }}">
+    <a href="{{ path('app_demande_new') }}" class="text-decoration-none">
+      <div class="card modern-card shadow-lg rounded-4 overflow-hidden h-100 animate-card position-relative hover-card">
+        <!-- Image -->
+        <img src="{{ asset('images/' ~ formation.image) }}" 
+             class="card-img-top" alt="{{ formation.titre }}" style="height: {{ isBPH ? '300px' : '220px' }}; object-fit: cover;">
+
+        <!-- Badge jours -->
+        <span class="badge badge-gradient position-absolute top-0 end-0 m-3 px-3 py-2 fs-6 rounded-pill shadow-sm">
+          {{ formation.jours }} jour{{ formation.jours > 1 ? 's' : '' }}
+        </span>
+
+        <!-- Titre visible sur fond semi-transparent -->
+        <div class="card-title-overlay position-absolute bottom-0 start-0 w-100 p-3">
+          <h5 class="fw-bold mb-0 text-white">{{ formation.titre }}</h5>
+        </div>
+
+        <!-- Overlay au hover -->
+        <div class="overlay-info position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white p-4 text-center">
+          {% if isBPH and formation.modules is defined %}
+            <ul class="modules-list ps-0 mb-0">
+              {% for module in formation.modules %}
+                <li>• {{ module }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="mb-0">{{ formation.description }} {% if formation.note is defined %}({{ formation.note }}){% endif %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </a>
+  </div>
+{% endfor %}
+</div>
+  </div>
+</section>
+
+<!-- Footer CTA -->
+<section class="py-5 text-center bg-primary text-white">
+    <div class="container fade-up">
+        <h2 class="fw-bold">Besoin d'une formation sur mesure ?</h2>
+        <p class="lead mb-4">Notre expert conçoit des programmes adaptés à vos besoins et à votre environnement de travail.</p>
+        <a href="#contact" class="btn btn btn-lg">Contactez-nous</a>
+    </div>
+</section>
+
+<script>
+  function showCardsOnScroll() {
+    const cards = document.querySelectorAll(".animate-card");
+    const trigger = window.innerHeight * 0.85;
+    cards.forEach(card => {
+      const top = card.getBoundingClientRect().top;
+      if (top < trigger) card.classList.add("visible");
+    });
+  }
+
+  document.addEventListener("scroll", showCardsOnScroll);
+  window.addEventListener("load", showCardsOnScroll);
+</script>
+{% endblock %}
