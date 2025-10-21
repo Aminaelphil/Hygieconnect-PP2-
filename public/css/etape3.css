@@ -1,0 +1,110 @@
+    .glass-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(18px);
+        border-radius: 25px;
+        padding: 3rem 2rem;
+        max-width: 850px;
+        margin: 3rem auto;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 3rem;
+        font-weight: 700;
+        color: #266fc2ff;
+    }
+
+    .prestation-card {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 1.8rem 1.5rem;
+        border: 1px solid rgba(255,255,255,0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .prestation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Checkbox cachée */
+    .prestation-card input[type="checkbox"] {
+        display: none;
+    }
+
+    .prestation-card label {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    /* Icône au-dessus du titre */
+    .prestation-icon {
+        font-size: 2rem;
+        color: #2457e4ff;
+        margin-bottom: 0.8rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .prestation-title {
+        font-weight: 700;
+        color: #2457e4ff;
+        margin-bottom: 0.5rem;
+        font-size: 1.15rem;
+        text-align: center;
+    }
+
+    .prestation-desc {
+        flex-grow: 1;
+        font-size: 0.95rem;
+        color: #000000;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .prestation-price {
+        font-weight: 700;
+        color: #030805ff;
+        font-size: 1rem;
+        text-align: center;
+        padding: 0.3rem 0.6rem;
+        border-radius: 12px;
+        background: rgba(89, 100, 129, 0.2);
+        transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Effet sélection */
+    .prestation-card input[type="checkbox"]:checked + label {
+        border-left: 5px solid #2457e4ff;
+        box-shadow: 0 0 20px rgba(36,87,228,0.35);
+    }
+
+    .prestation-card input[type="checkbox"]:checked + label .prestation-price {
+        background: #2457e4ff;
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    /* Animation icône */
+    .prestation-card:hover .prestation-icon {
+        transform: scale(1.2) rotate(10deg);
+    }
+
+    @media (max-width: 576px) {
+        .glass-card {
+            padding: 2rem 1rem;
+            margin: 2rem 1rem;
+        }
+    }

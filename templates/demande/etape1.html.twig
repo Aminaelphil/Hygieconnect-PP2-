@@ -1,178 +1,52 @@
 {% extends 'base.html.twig' %}
+
+{% block title %}Étape 1 — Vos informations{% endblock %}
 {% block stylesheets %} 
 <link rel="stylesheet" href="{{ asset('css/etape1.css') }}"> 
 {% endblock %}
-{% block title %}{{ demande.id is defined ? 'Remplir demande - Étape 1' : 'Nouvelle demande - Étape 1' }}{% endblock %}
-
 {% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg border-0 rounded-4 p-4">
-                <h2 class="mb-4 fw-bold text-primary">
-                     {{ demande.id is defined ? 'Remplir votre demande' : 'Choisissez votre catégorie et prestations' }}
-                </h2>
-
-                <form method="POST" class="needs-validation" novalidate>
-                    <!-- Catégorie -->
-                    <div class="mb-4">
-                        <label for="categorie" class="form-label fw-semibold">Catégorie</label>
-                        <select name="demande[categorie]" id="categorie" class="form-select form-select-lg" required>
-                            <option value="">Choisissez une catégorie</option>
-                            {% for categorie in categories %}
-                                <option value="{{ categorie.id }}"
-                                    {% if demande.categorie is defined and demande.categorie and demande.categorie.id == categorie.id %}selected{% endif %}>
-                                    {{ categorie.nom }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            Veuillez sélectionner une catégorie.
-                        </div>
-                    </div>
-
-                    <!-- Prestations dynamiques -->
-                    <div id="prestations_container" class="mb-4">
-                        {% if demande.prestations is defined and demande.prestations|length > 0 %}
-                            {% for prestation in demande.prestations %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="prestations[]" value="{{ prestation.id }}" checked id="prestation-{{ prestation.id }}">
-                                    <label class="form-check-label" for="prestation-{{ prestation.id }}">
-                                        {{ prestation.titre }} - {{ prestation.prix }} DT
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <!-- Date de début -->
-                    <div class="mb-4">
-                        <label for="dateDebut" class="form-label fw-semibold">Date de début</label>
-                        <input type="date" id="dateDebut" name="demande[dateDebut]"
-                               class="form-control form-control-lg"
-                               value="{{ demande.dateDebut is defined and demande.dateDebut ? demande.dateDebut|date('Y-m-d') : '' }}" required>
-                        <div class="invalid-feedback">
-                            Veuillez renseigner la date de début.
-                        </div>
-                    </div>
-
-                    <!-- Date de fin -->
-                    <div class="mb-4">
-                        <label for="dateFin" class="form-label fw-semibold">Date de fin</label>
-                        <input type="date" id="dateFin" name="demande[dateFin]"
-                               class="form-control form-control-lg"
-                               value="{{ demande.dateFin is defined and demande.dateFin ? demande.dateFin|date('Y-m-d') : '' }}" required>
-                        <div class="invalid-feedback">
-                            Veuillez renseigner la date de fin.
-                        </div>
-                    </div>
-
-                    <!-- Nature du demandeur -->
-                    <div class="mb-4">
-                        <label for="natureDemandeur" class="form-label fw-semibold">Nature du demandeur</label>
-                        <select name="demande[naturedemandeur]" id="natureDemandeur" class="form-select form-select-lg" required>
-                            <option value="">Choisissez la nature du demandeur</option>
-                            <option value="particulier" {% if demande.naturedemandeur == 'particulier' %}selected{% endif %}>Particulier</option>
-                            <option value="hotel" {% if demande.naturedemandeur == 'hotel' %}selected{% endif %}>Hôtel</option>
-                            <option value="centre_formation" {% if demande.naturedemandeur == 'centre_formation' %}selected{% endif %}>Centre de formation</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Veuillez sélectionner la nature du demandeur.
-                        </div>
-                    </div>
-
-                    <!-- Adresse de la prestation -->
-                    <div class="mb-4" id="adressePrestationField" style="display: {% if demande.adresseprestation %}block{% else %}none{% endif %};">
-                        <label for="adressePrestation" class="form-label fw-semibold">Adresse de la prestation</label>
-                        <input type="text" id="adressePrestation" name="demande[adresseprestation]"
-                               class="form-control form-control-lg"
-                               value="{{ demande.adresseprestation ?: '' }}"
-                               placeholder="Indiquez l'adresse exacte du lieu">
-                        <div class="invalid-feedback">
-                            Veuillez renseigner l'adresse de la prestation.
-                        </div>
-                    </div>
-
-                    <!-- Informations supplémentaires -->
-                    <div class="mb-4">
-                        <label for="infossupplementaires" class="form-label fw-semibold">Informations supplémentaires</label>
-                        <textarea id="infossupplementaires" name="demande[infossupplementaires]"
-                                  class="form-control" rows="3"
-                                  placeholder="Ajouter des informations supplémentaires si nécessaire">{{ demande.infossupplementaires ?: '' }}</textarea>
-                    </div>
-
-                    <!-- Bouton -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-gradient btn-lg rounded-3 shadow-sm">
-                            Suivant
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Script pour prestations dynamiques et adresse dynamique -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selectCategorie = document.querySelector('#categorie');
-    const prestationsContainer = document.querySelector('#prestations_container');
-
-    selectCategorie.addEventListener('change', function () {
-        const id = this.value;
-        if (!id) {
-            prestationsContainer.innerHTML = '';
-            return;
-        }
-
-        fetch('/get-prestations/' + id)
-            .then(res => {
-                if (!res.ok) throw new Error('Erreur serveur');
-                return res.text();
-            })
-            .then(html => {
-                prestationsContainer.innerHTML = html;
-            })
-            .catch(err => {
-                prestationsContainer.innerHTML = '<p class="text-danger">Erreur chargement prestations</p>';
-                console.error(err);
-            });
-    });
-
-    // Affichage dynamique de l'adresse de la prestation
-    const natureDemandeurSelect = document.querySelector('#natureDemandeur');
-    const adresseField = document.getElementById('adressePrestationField');
-
-    natureDemandeurSelect.addEventListener('change', function() {
-        if (this.value) {
-            adresseField.style.display = 'block';
-        } else {
-            adresseField.style.display = 'none';
-        }
-    });
-
-    // Validation bootstrap
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        });
-    });
-});
-</script>
-
 <style>
-body {
-    background-image: url('{{ asset('images/back3.jpg') }}');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: fixed;
-}
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+    }
 </style>
+
+<div class="container">
+    <form method="post" class="glass-card">
+        <h2>Étape 1 — Informations du demandeur</h2>
+
+        <div class="mb-3">
+            <label class="form-label">Nom complet</label>
+            <input type="text" name="demande[nom]" value="{{ stepData.nom ?? '' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Adresse e-mail</label>
+            <input type="email" name="demande[email]" value="{{ stepData.email ?? '' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Numéro de téléphone</label>
+            <input type="text" name="demande[telephone]" value="{{ stepData.telephone ?? '' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nature du demandeur</label>
+            <input type="text" name="demande[naturedemandeur]" value="{{ stepData.naturedemandeur ?? '' }}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Adresse de la prestation</label>
+            <input type="text" name="demande[adresseprestation]" value="{{ stepData.adresseprestation ?? '' }}" class="form-control">
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Étape suivante</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

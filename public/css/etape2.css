@@ -1,17 +1,58 @@
-.facture-card {
-    background: #f9fcff;
-    border-radius: 20px;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 2rem;
-}
-.btn-lg {
-    font-weight: 600;
-    padding: 12px 28px;
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-}
-.btn-lg:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
+    /* Formulaire centré et moderne */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        max-width: 500px;
+        width: 100%;
+        margin: 3rem auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 60px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        color: #266fc2ff;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #000000;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid #ddd;
+        color: #333;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(255, 255, 255, 1);
+        border-color: #2457e4ff;
+        box-shadow: 0 0 0 0.2rem rgba(61, 143, 219, 0.25);
+        color: #333;
+        outline: none;
+    }
+
+    /* Responsive padding pour mobile */
+    @media (max-width: 576px) {
+        .glass-card {
+            padding: 2rem 1rem;
+            margin: 2rem 1rem;
+        }
+    }

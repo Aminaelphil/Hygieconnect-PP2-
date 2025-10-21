@@ -1,4 +1,3 @@
-    /* Formulaire centré et moderne */
     .glass-card {
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(12px);
@@ -28,11 +27,11 @@
 
     .form-label {
         font-weight: 600;
-        color: #000000ff;
+        color: #000000;
         font-size: 0.95rem;
     }
 
-    .form-control {
+    .form-control, textarea.form-control {
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.85);
         border: 1px solid #ddd;
@@ -41,7 +40,7 @@
         transition: all 0.3s ease;
     }
 
-    .form-control:focus {
+    .form-control:focus, textarea.form-control:focus {
         background: rgba(255, 255, 255, 1);
         border-color: #2457e4ff;
         box-shadow: 0 0 0 0.2rem rgba(61, 143, 219, 0.25);
@@ -49,7 +48,6 @@
         outline: none;
     }
 
-    /* Responsive padding pour mobile */
     @media (max-width: 576px) {
         .glass-card {
             padding: 2rem 1rem;

@@ -1,106 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Demande - Étape 2{% endblock %}
+{% block title %}Étape 2 — Choix de la catégorie{% endblock %}
 {% block stylesheets %} 
 <link rel="stylesheet" href="{{ asset('css/etape2.css') }}"> 
-<style>
-
-body {
-    background-image: url('{{ asset('images/back3.jpg') }}');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: fixed;
-}
-</style>
 {% endblock %}
 {% block body %}
-<div class="container my-5">
-    <div class="card shadow-lg rounded-4 p-4 facture-card">
-        <!-- Header facture -->
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px;">
-            <div>
-                <h3 class="fw-bold text-primary">HygieConnect</h3>
-                <p class="mb-0 text-muted">Service de prestations personnalisées</p>
-            </div>
-            <div style="text-align: right;">
-                <h5 class="fw-bold">Devis N°: #{{ demande.id }}</h5>
-                <p class="mb-0 text-muted">Date : {{ "now"|date("d/m/Y") }}</p>
-                {% if demande.dateDebut and demande.dateFin %}
-                    <p class="mb-0 text-muted">
-                        Période : {{ demande.dateDebut|date('d/m/Y') }} - {{ demande.dateFin|date('d/m/Y') }}
-                    </p>
-                {% endif %}
-            </div>
+<style>
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+
+</style>
+
+<div class="container">
+    <form method="post" class="glass-card">
+        <h2>Étape 2 — Choisissez une catégorie</h2>
+
+        <div class="mb-3">
+            <label class="form-label" for="categorie">Catégorie</label>
+            <select name="demande[categorie]" id="categorie" class="form-select" required>
+                <option value="">-- Sélectionnez une catégorie --</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if cat.id == selectedCategorieId %}selected{% endif %}>
+                        {{ cat.nom }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
 
-        <h2 class="mb-4 text-center text-secondary">Devis estimatif</h2>
-
-        <!-- Infos demandeur -->
-        <div class="mb-4">
-            <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur|capitalize ?: '-' }}</p>
-            <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation ?: '-' }}</p>
-            <p><strong>Informations supplémentaires :</strong> {{ demande.infossupplementaires ?: '-' }}</p>
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Étape suivante</button>
+              <a href="{{ path('app_demande_new') }}" class="btn btn-dark">Retour</a>
         </div>
-
-        {% if demande.prestations|length > 0 %}
-            <!-- Table simple compatible PDF -->
-            <table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse;">
-                <thead>
-                    <tr style="background-color: #f1f1f1;">
-                        <th>Prestation</th>
-                        <th>Description</th>
-                        <th>Durée</th>
-                        <th>Prix (DT)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for prestation in demande.prestations %}
-                        <tr>
-                            <td>{{ prestation.titre }}</td>
-                            <td>{{ prestation.description ?: '-' }}</td>
-                            <td>{{ prestation.duree ?: '-' }}</td>
-                            <td>{{ prestation.prix ?: '-' }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" align="right"><strong>Total estimé :</strong></td>
-                        <td>{{ total }} DT</td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="mt-3 text-muted small border-top pt-3">
-                <p><strong>Note :</strong> Ce devis est estimatif et peut varier selon la disponibilité et la complexité des prestations.</p>
-            </div>
-
-            <div class="d-flex justify-content-center mt-4 gap-3 flex-wrap">
-                <a href="{{ demande.id is defined ? path('app_demande_edit', {'id': demande.id}) : path('app_demande_new') }}"
-                   class="btn btn-primary btn-lg shadow-sm">
-                    &larr; Retour à l'étape 1
-                </a>
-                <a href="{{ path('app_demande_download', {'id': demande.id}) }}"
-                   class="btn btn-success btn-lg shadow-sm">
-                   Télécharger le devis (PDF)
-                </a>
-                    <a href="#"
-                        class="btn btn-primary btn-lg shadow-sm disabled" title="Bientôt disponible">
-                        S'inscrire pour valider
-                        </a>
-            </div>
-
-        {% else %}
-            <p class="text-muted fst-italic text-center">Aucune prestation sélectionnée.</p>
-            <div class="d-flex justify-content-center mt-3">
-                <a href="{{ path('app_demande_new') }}" class="btn btn-info btn-lg shadow-sm">
-                    &larr; Retour à l'étape 1
-                </a>
-            </div>
-        {% endif %}
-    </div>
+    </form>
 </div>
-
-
 {% endblock %}

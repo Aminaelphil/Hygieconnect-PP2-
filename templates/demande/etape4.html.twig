@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Étape 4 — Détails de la prestation{% endblock %}
+{% block stylesheets %} 
+<link rel="stylesheet" href="{{ asset('css/etape4.css') }}"> 
+{% endblock %}
+{% block body %}
+<style>
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+
+</style>
+
+<div class="container">
+    <form method="post" class="glass-card">
+        <h2>Étape 4 — Détails de la période et informations</h2>
+
+        <div class="mb-3">
+            <label class="form-label">Date de début</label>
+            <input type="date" name="demande[dateDebut]" value="{{ stepData.dateDebut ?? '' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Date de fin</label>
+            <input type="date" name="demande[dateFin]" value="{{ stepData.dateFin ?? '' }}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Informations supplémentaires</label>
+            <textarea name="demande[infossupplementaires]" rows="4" class="form-control">{{ stepData.infossupplementaires ?? '' }}</textarea>
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Voir le devis estimatif</button>
+                <a href="{{ path('app_demande_etape3') }}" class="btn btn-dark">Retour</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,48 +1,26 @@
 <div class="row g-4">
     {% for prestation in prestations %}
         <div class="col-12 col-sm-6 col-lg-4">
-            <label class="card prestation-card h-100 shadow-sm border-0 cursor-pointer p-0">
-                <input class="form-check-input prestation-checkbox d-none" type="checkbox" name="prestations[]" value="{{ prestation.id }}">
-                <div class="card-body d-flex flex-column">
+            <label class="prestation-card h-100 shadow-sm border-0 cursor-pointer d-block position-relative">
+                <input class="prestation-checkbox d-none" type="checkbox" name="prestations[]" value="{{ prestation.id }}">
+                
+                {% if prestation.prix %}
+                    <div class="price-tag">{{ prestation.prix }} DT</div>
+                {% endif %}
+
+                <div class="card-body d-flex flex-column bg-white rounded p-3">
                     <h5 class="card-title mb-1">{{ prestation.titre }}</h5>
                     <p class="card-text text-muted small mb-2">{{ prestation.description }}</p>
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
-                        {% if prestation.duree %}
-                            <span class="badge bg-info text-dark">{{ prestation.duree }}</span>
-                        {% endif %}
-                        {% if prestation.prix %}
-                            <span class="fw-bold text-success">{{ prestation.prix }} DT</span>
-                        {% endif %}
-                    </div>
+                    {% if prestation.duree %}
+                        <span class="badge bg-info text-dark mt-auto">{{ prestation.duree }}</span>
+                    {% endif %}
                 </div>
             </label>
         </div>
     {% else %}
         <div class="col-12">
-            <p class="text-muted fst-italic">Aucune prestation disponible pour cette catégorie.</p>
+            <p class="text-muted fst-italic text-center">Aucune prestation disponible pour cette catégorie.</p>
         </div>
     {% endfor %}
 </div>
 
-<style>
-.prestation-card {
-    border-radius: 12px;
-    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
-    cursor: pointer;
-    background: #ffffff;
-    display: block;
-    height: 100%;
-}
-
-.prestation-card:hover {
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-    background-color: #f8f9fa;
-}
-
-/* Highlight si sélectionnée */
-.prestation-checkbox:checked + .card-body {
-    background-color: #e7f1ff;
-    border-radius: 12px;
-}
-</style>

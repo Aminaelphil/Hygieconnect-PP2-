@@ -5,71 +5,207 @@ namespace App\Controller;
 use App\Entity\Demande;
 use App\Entity\Prestation;
 use App\Repository\CategorieRepository;
+use App\Repository\PrestationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DemandeController extends AbstractController
 {
+    private const WIZARD_KEY = 'demande_wizard';
+
+    private CategorieRepository $categorieRepository;
+    private PrestationRepository $prestationRepository;
+
+    public function __construct(
+        CategorieRepository $categorieRepository,
+        PrestationRepository $prestationRepository
+    ) {
+        $this->categorieRepository  = $categorieRepository;
+        $this->prestationRepository = $prestationRepository;
+    }
+
     /**
-     * Étape 1 — Création d'une nouvelle demande et calcul du devis
+     * Étape 1 — Informations du demandeur
      */
-    #[Route('/demande/new', name: 'app_demande_new')]
-    public function new(Request $request, EntityManagerInterface $em, CategorieRepository $categorieRepository): Response
+    #[Route('/demande/etape-1', name: 'app_demande_new')]
+    public function etape1(Request $request, SessionInterface $session): Response
     {
+        // Réinitialiser le wizard si c'est une nouvelle demande
+        if ($request->query->get('new') === '1') {
+            $session->remove(self::WIZARD_KEY);
+        }
+
+        $data = $session->get(self::WIZARD_KEY, []);
+
+        if ($request->isMethod('POST')) {
+            $posted = $request->request->all('demande');
+            $data['etape1'] = [
+                'nom' => $posted['nom'] ?? null,
+                'email' => $posted['email'] ?? null,
+                'telephone' => $posted['telephone'] ?? null,
+                'naturedemandeur' => $posted['naturedemandeur'] ?? null,
+                'adresseprestation' => $posted['adresseprestation'] ?? null,
+            ];
+            $session->set(self::WIZARD_KEY, $data);
+
+            return $this->redirectToRoute('app_demande_etape2');
+        }
+
+        return $this->render('demande/etape1.html.twig', [
+            'stepData' => $data['etape1'] ?? [],
+        ]);
+    }
+
+
+    /**
+     * Étape 2 — Choix de la catégorie
+     */
+    #[Route('/demande/etape-2', name: 'app_demande_etape2')]
+    public function etape2(Request $request, SessionInterface $session): Response
+    {
+        $categories = $this->categorieRepository->findAll();
+        $data = $session->get(self::WIZARD_KEY, []);
+
+        if ($request->isMethod('POST')) {
+            $posted = $request->request->all('demande');
+            $data['categorie_id'] = $posted['categorie'] ?? null;
+            $session->set(self::WIZARD_KEY, $data);
+
+            return $this->redirectToRoute('app_demande_etape3');
+        }
+
+        return $this->render('demande/etape2.html.twig', [
+            'categories' => $categories,
+            'selectedCategorieId' => $data['categorie_id'] ?? null,
+        ]);
+    }
+
+    /**
+     * Étape 3 — Choix des prestations
+     */
+    #[Route('/demande/etape-3', name: 'app_demande_etape3')]
+    public function etape3(Request $request, SessionInterface $session): Response
+    {
+        $data = $session->get(self::WIZARD_KEY, []);
+        $categorieId = $data['categorie_id'] ?? null;
+        $prestations = [];
+
+        if ($categorieId) {
+            $categorie = $this->categorieRepository->find($categorieId);
+            if ($categorie) {
+                $prestations = $categorie->getPrestations();
+            }
+        }
+
+        if ($request->isMethod('POST')) {
+            $postedPrestations = $request->request->all('prestations');
+            $data['prestations'] = is_array($postedPrestations) ? array_values($postedPrestations) : [];
+            $session->set(self::WIZARD_KEY, $data);
+
+            return $this->redirectToRoute('app_demande_etape4');
+        }
+
+        return $this->render('demande/etape3.html.twig', [
+            'prestations' => $prestations,
+            'selectedPrestations' => $data['prestations'] ?? [],
+        ]);
+    }
+
+    /**
+     * Étape 4 — Période & informations supplémentaires
+     */
+    #[Route('/demande/etape-4', name: 'app_demande_etape4')]
+    public function etape4(Request $request, SessionInterface $session): Response
+    {
+        $data = $session->get(self::WIZARD_KEY, []);
+
+        if ($request->isMethod('POST')) {
+            $posted = $request->request->all('demande');
+            $data['dateDebut'] = $posted['dateDebut'] ?? null;
+            $data['dateFin'] = $posted['dateFin'] ?? null;
+            $data['infossupplementaires'] = $posted['infossupplementaires'] ?? null;
+            $session->set(self::WIZARD_KEY, $data);
+
+            return $this->redirectToRoute('app_demande_etape5');
+        }
+
+        return $this->render('demande/etape4.html.twig', [
+            'stepData' => $data,
+        ]);
+    }
+
+    /**
+     * Étape 5 — Devis estimatif et enregistrement en base
+     */
+    #[Route('/demande/etape-5', name: 'app_demande_etape5')]
+    public function etape5(SessionInterface $session, EntityManagerInterface $em): Response
+    {
+        $data = $session->get(self::WIZARD_KEY, []);
+
+        $selectedPrestations = $data['prestations'] ?? [];
+        $prestationsEntities = [];
+
+        if (!empty($selectedPrestations)) {
+            $prestationsEntities = $this->prestationRepository->findBy(['id' => $selectedPrestations]);
+        }
+
+        // Calcul du total
+        $total = 0;
+        if (!empty($data['dateDebut']) && !empty($data['dateFin']) && !empty($prestationsEntities)) {
+            try {
+                $dDeb = new \DateTimeImmutable($data['dateDebut']);
+                $dFin = new \DateTimeImmutable($data['dateFin']);
+                $jours = $dDeb->diff($dFin)->days + 1;
+                foreach ($prestationsEntities as $p) {
+                    $total += ($p->getPrix() ?? 0) * $jours;
+                }
+            } catch (\Exception $e) {}
+        }
+
+        // --- Enregistrement de la demande pour avoir un ID ---
         $demande = new Demande();
-        $categories = $categorieRepository->findAll();
+        $demande->setDatedemande(new \DateTimeImmutable());
+        $demande->setDatedebut(!empty($data['dateDebut']) ? new \DateTimeImmutable($data['dateDebut']) : null);
+        $demande->setDatefin(!empty($data['dateFin']) ? new \DateTimeImmutable($data['dateFin']) : null);
+        $demande->setInfossupplementaires($data['infossupplementaires'] ?? null);
+        $demande->setNaturedemandeur($data['etape1']['naturedemandeur'] ?? null);
+        $demande->setAdresseprestation($data['etape1']['adresseprestation'] ?? null);
+        $demande->setDevisestime($total);
+        $demande->setStatut(Demande::STATUT_EN_ATTENTE);
 
-        // Pré-remplissage depuis query parameters
-        $query = $request->query;
-        if ($query->get('dateDebut')) {
-            $demande->setDatedebut(new \DateTimeImmutable($query->get('dateDebut')));
-        }
-        if ($query->get('dateFin')) {
-            $demande->setDatefin(new \DateTimeImmutable($query->get('dateFin')));
-        }
-
-        if ($request->isMethod('POST')) {
-            $this->handleDemandeForm($request, $demande, $em);
-            return $this->renderEtape2($demande);
+        foreach ($prestationsEntities as $p) {
+            $demande->addPrestation($p);
         }
 
-        return $this->render('demande/etape1.html.twig', [
-            'categories' => $categories,
+        $em->persist($demande);
+        $em->flush();
+
+        // Numéro de devis basé sur l'ID
+        $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
+
+        return $this->render('demande/etape5.html.twig', [
+            'prestations' => $prestationsEntities,
+            'total' => $total,
             'demande' => $demande,
+            'devisNumero' => $devisNumero,
+            'stepData' => $data,
         ]);
     }
 
     /**
-     * Étape 1 — Modification d'une demande existante et calcul du devis
-     */
-    #[Route('/demande/{id}/edit', name: 'app_demande_edit')]
-    public function edit(Demande $demande, Request $request, EntityManagerInterface $em, CategorieRepository $categorieRepository): Response
-    {
-        $categories = $categorieRepository->findAll();
-
-        if ($request->isMethod('POST')) {
-            $this->handleDemandeForm($request, $demande, $em);
-            return $this->renderEtape2($demande);
-        }
-
-        return $this->render('demande/etape1.html.twig', [
-            'categories' => $categories,
-            'demande' => $demande,
-        ]);
-    }
-
-    /**
-     * Récupère les prestations d'une catégorie
+     * Récupération dynamique des prestations par catégorie (AJAX)
      */
     #[Route('/get-prestations/{id}', name: 'get_prestations_by_categorie', methods: ['GET'])]
-    public function getPrestationsByCategorie(int $id, CategorieRepository $categorieRepository): Response
+    public function getPrestationsByCategorie(int $id): Response
     {
-        $categorie = $categorieRepository->find($id);
+        $categorie = $this->categorieRepository->find($id);
 
         if (!$categorie) {
             return new Response('Catégorie non trouvée', 404);
@@ -81,87 +217,49 @@ class DemandeController extends AbstractController
     }
 
     /**
-     * Gère la soumission du formulaire (création ou édition)
+     * Génération PDF
      */
-    private function handleDemandeForm(Request $request, Demande $demande, EntityManagerInterface $em): void
+    #[Route('/demande/devis/pdf/{id}', name: 'app_demande_pdf')]
+    public function generatePdf(Request $request, Demande $demande): Response
     {
-        $postData = $request->request->all();
-        $demandeData = $postData['demande'] ?? [];
+        // Récupération des données du wizard depuis la session
+        $wizardData = $request->getSession()->get('demande_wizard', []);
+        $etape1 = $wizardData['etape1'] ?? [];
 
-        $dateDebut      = $demandeData['dateDebut'] ?? null;
-        $dateFin        = $demandeData['dateFin'] ?? null;
-        $prestationsIds = $postData['prestations'] ?? [];
+        // Récupération des prestations et du total
+        $prestationsEntities = $demande->getPrestations();
+        $total = $demande->getDevisestime();
 
-        if ($dateDebut) $demande->setDatedebut(new \DateTimeImmutable($dateDebut));
-        if ($dateFin) $demande->setDatefin(new \DateTimeImmutable($dateFin));
+        // Numéro de devis
+        $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
 
-        $demande->setNaturedemandeur($demandeData['naturedemandeur'] ?? null);
-        $demande->setAdresseprestation($demandeData['adresseprestation'] ?? null);
-        $demande->setInfossupplementaires($demandeData['infossupplementaires'] ?? null);
-
-        // Reset des prestations existantes et ajout des nouvelles
-        $demande->getPrestations()->clear();
-        if (!empty($prestationsIds)) {
-            $prestations = $em->getRepository(Prestation::class)
-                ->findBy(['id' => $prestationsIds]);
-
-            foreach ($prestations as $prestation) {
-                $demande->addPrestation($prestation);
-            }
-        }
-
-        // Calcul du devis
-        $total = 0;
-        if ($demande->getDatedebut() && $demande->getDatefin()) {
-            $jours = $demande->getDatedebut()->diff($demande->getDatefin())->days + 1;
-            foreach ($demande->getPrestations() as $p) {
-                $total += ($p->getPrix() ?? 0) * $jours;
-            }
-        }
-
-        $demande->setDevisestime($total);
-        if (!$demande->getDatedemande()) {
-            $demande->setDatedemande(new \DateTimeImmutable());
-        }
-
-        $em->persist($demande);
-        $em->flush();
-    }
-
-    /**
-     * Affiche l'étape 2 avec le devis calculé
-     */
-    private function renderEtape2(Demande $demande): Response
-    {
-        return $this->render('demande/etape2.html.twig', [
+        // Génération du HTML du PDF
+        $html = $this->renderView('demande/devis_pdf.html.twig', [
+            'prestations' => $prestationsEntities,
+            'total' => $total,
             'demande' => $demande,
-            'total' => $demande->getDevisestime(),
+            'devisNumero' => $devisNumero,
+            'isPdf' => true,
+            'nom' => $etape1['nom'] ?? null,
+            'email' => $etape1['email'] ?? null,
+            'telephone' => $etape1['telephone'] ?? null,
+        ]);
+
+        // Configuration Dompdf
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Retourne le PDF en téléchargement (attachment)
+        return new StreamedResponse(function() use ($dompdf) {
+            echo $dompdf->output();
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="devis.pdf"',
         ]);
     }
-#[Route('/demande/{id}/download', name: 'app_demande_download')]
-public function download(Demande $demande): Response
-{
-    $options = new Options();
-    $options->set('defaultFont', 'Arial');
-    $options->set('isRemoteEnabled', true); 
 
-    $dompdf = new Dompdf($options);
-
-    $html = $this->renderView('demande/etape2_pdf.html.twig', [
-        'demande' => $demande,
-        'total' => $demande->getDevisestime(),
-    ]);
-
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
-
-    return new Response(
-        $dompdf->stream('devis_' . $demande->getId() . '.pdf', ['Attachment' => true]),
-        200,
-        [
-            'Content-Type' => 'application/pdf'
-        ]
-    );
-}
 }

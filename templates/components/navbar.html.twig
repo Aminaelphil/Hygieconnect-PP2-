@@ -1,7 +1,6 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/stylebase.css') }}">
     <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 {% endblock %}
 
@@ -33,7 +32,7 @@
                     <a class="nav-link" href="#">Contact</a>
                 </li>
                 <li class="nav-item ms-2">
-                    <a class="btn btn-primary btn-sm px-4" href="{{ path('app_demande_new')}}">Demande de service</a>
+                    <a class="btn btn-primary btn-sm px-4" href="{{ path('app_demande_new', {'new': 1}) }}">Demande de service</a>
                 </li>
             </ul>
         </div>

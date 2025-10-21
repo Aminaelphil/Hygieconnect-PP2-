@@ -1,0 +1,102 @@
+
+{% block title %}Devis PDF{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #333;
+        line-height: 1.4;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #2457e4;
+        margin: 0;
+    }
+
+    .infos-demandeur {
+        margin-bottom: 30px;
+    }
+
+    .infos-demandeur p {
+        margin: 4px 0;
+    }
+
+    .prestations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .prestations-table th, .prestations-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .prestations-table th {
+        background-color: #2457e4;
+        color: #fff;
+    }
+
+    .total {
+        text-align: right;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .devis-numero {
+        text-align: right;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="header">
+    <h1>Devis</h1>
+</div>
+
+<div class="devis-numero">
+    Numéro du devis : {{ devisNumero }}
+</div>
+
+<div class="infos-demandeur">
+    <p><strong>Nom :</strong> {{ nom ?? 'Non renseigné' }}</p>
+    <p><strong>Email :</strong> {{ email ?? 'Non renseigné' }}</p>
+    <p><strong>Téléphone :</strong> {{ telephone ?? 'Non renseigné' }}</p>
+    <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur }}</p>
+    <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation }}</p>
+</div>
+
+{% if prestations is not empty %}
+    <table class="prestations-table">
+        <thead>
+            <tr>
+                <th>Prestation</th>
+                <th>Description</th>
+                <th>Prix (DT)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prestation in prestations %}
+                <tr>
+                    <td>{{ prestation.titre }}</td>
+                    <td>{{ prestation.description }}</td>
+                    <td>{{ prestation.prix }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="total">Total estimé : {{ total }} DT</p>
+{% else %}
+    <p>Aucune prestation sélectionnée.</p>
+{% endif %}
+
+{% endblock %}

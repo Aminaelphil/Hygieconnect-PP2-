@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Étape 5 — Devis estimatif{% endblock %}
+{% block stylesheets %} 
+<link rel="stylesheet" href="{{ asset('css/etape5.css') }}"> 
+{% endblock %}
+{% block body %}
+<style>
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+    }
+</style>
+
+<div class="container">
+    <div class="glass-card">
+        <h2>Étape 5 — Devis estimatif</h2>
+
+        <h5 class="mb-3">Résumé de votre demande</h5>
+        <ul class="list-unstyled">
+            <li><strong>Nom :</strong> {{ stepData.etape1.nom }}</li>
+            <li><strong>Email :</strong> {{ stepData.etape1.email }}</li>
+            <li><strong>Téléphone :</strong> {{ stepData.etape1.telephone }}</li>
+            <li><strong>Adresse :</strong> {{ stepData.etape1.adresseprestation }}</li>
+            <li><strong>Dates :</strong> {{ stepData.dateDebut }} → {{ stepData.dateFin }}</li>
+        </ul>
+
+        <hr>
+
+        <h5 class="mb-3">Prestations sélectionnées :</h5>
+        {% if prestations is not empty %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prestation</th>
+                            <th>Description</th>
+                            <th class="text-end">Prix</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in prestations %}
+                            <tr>
+                                <td>{{ p.titre }}</td>
+                                <td>{{ p.description }}</td>
+                                <td class="text-end"><span class="badge-prix">{{ p.prix }} DT</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" class="text-end">Total estimé :</td>
+                            <td class="text-end"><span class="badge-prix">{{ total }} DT</span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Aucune prestation sélectionnée.</p>
+        {% endif %}
+
+        <p class="mt-3 text-muted"><small>Ce devis est valable pendant 30 jours.</small></p>
+
+        <!-- Boutons -->
+        <div class="d-flex mt-4">
+            <a href="{{ path('app_demande_etape4') }}" class="btn btn-dark">Retour</a>
+            <a href="{{ path('app_demande_new') }}" class="btn btn-primary">Recommencer</a>
+        <a href="{{ path('app_demande_pdf', {'id': demande.id}) }}" class="btn btn-dark" target="_blank">Télécharger le devis en PDF</a>
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}

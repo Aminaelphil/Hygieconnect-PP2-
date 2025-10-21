@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Étape 3 — Choix des prestations{% endblock %}
+{% block stylesheets %} 
+<link rel="stylesheet" href="{{ asset('css/etape3.css') }}"> 
+{% endblock %}
+{% block body %}
+<style>
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        font-family: 'Poppins', sans-serif;
+    }
+
+
+</style>
+
+<div class="container">
+    {% if prestations is empty %}
+        <p class="text-muted text-center mt-5">Aucune prestation disponible pour cette catégorie.</p>
+    {% else %}
+        <form method="post" class="glass-card">
+            <h2>Étape 3 — Sélectionnez vos prestations</h2>
+
+            <div class="row g-3">
+                {% for prestation in prestations %}
+                    <div class="col-md-6">
+                        <div class="prestation-card">
+                            <input type="checkbox"
+                                   name="prestations[]"
+                                   value="{{ prestation.id }}"
+                                   id="prestation_{{ prestation.id }}"
+                                   {% if prestation.id in selectedPrestations %}checked{% endif %}>
+                            <label for="prestation_{{ prestation.id }}">
+                            
+                                <div class="prestation-title">{{ prestation.titre }}</div>
+                                <div class="prestation-desc">{{ prestation.description }}</div>
+                                <div class="prestation-price">{{ prestation.prix }} DT</div>
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary ">Étape suivante</button>
+ 
+            </div>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
