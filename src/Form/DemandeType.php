@@ -35,17 +35,27 @@ class DemandeType extends AbstractType
             ])
             ->add('dateDebut', DateType::class, [
                 'widget' => 'single_text',
+                'html5' => true,
                 'label' => 'Date de début',
+                'attr' => [
+                    'min' => (new \DateTime('today'))->format('d/m/Y'), // interdit les dates avant aujourd'hui
+                ],
             ])
             ->add('dateFin', DateType::class, [
                 'widget' => 'single_text',
+                'html5' => true,
                 'label' => 'Date de fin',
+                'attr' => [
+                    'min' => (new \DateTime('today'))->format('d/m/Y'), // interdit les dates avant aujourd'hui
+                ],
             ])
+
             ->add('naturedemandeur', ChoiceType::class, [
                 'choices' => [
                     'Particulier' => 'particulier',
                     'Hôtel' => 'hotel',
                     'Centre de formation' => 'centre_formation',
+                    'Clinique/Hôpital' => 'Clinique/Hôpital',
                 ],
                 'placeholder' => 'Choisir la nature du demandeur',
                 'label' => 'Nature du demandeur',

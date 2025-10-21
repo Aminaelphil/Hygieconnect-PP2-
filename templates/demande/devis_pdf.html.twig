@@ -1,4 +1,3 @@
-
 {% block title %}Devis PDF{% endblock %}
 
 {% block body %}
@@ -70,8 +69,14 @@
     <p><strong>Nom :</strong> {{ nom ?? 'Non renseigné' }}</p>
     <p><strong>Email :</strong> {{ email ?? 'Non renseigné' }}</p>
     <p><strong>Téléphone :</strong> {{ telephone ?? 'Non renseigné' }}</p>
-    <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur }}</p>
-    <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation }}</p>
+    <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur ?? 'Non renseigné' }}</p>
+    <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation ?? 'Non renseignée' }}</p>
+    <p><strong>Date de début :</strong> 
+        {{ demande.dateDebut ? demande.dateDebut|date('d/m/Y') : 'Non renseignée' }}
+    </p>
+    <p><strong>Date de fin :</strong> 
+        {{ demande.dateFin ? demande.dateFin|date('d/m/Y') : 'Non renseignée' }}
+    </p>
 </div>
 
 {% if prestations is not empty %}
@@ -95,8 +100,8 @@
     </table>
 
     <p class="total">Total estimé : {{ total }} DT</p>
+    <p>Ce devis a une validité de 30 jours.</p>
 {% else %}
     <p>Aucune prestation sélectionnée.</p>
 {% endif %}
-
 {% endblock %}

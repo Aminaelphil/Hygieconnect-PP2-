@@ -33,11 +33,17 @@
             <label class="form-label">Numéro de téléphone</label>
             <input type="text" name="demande[telephone]" value="{{ stepData.telephone ?? '' }}" class="form-control" required>
         </div>
-
         <div class="mb-3">
             <label class="form-label">Nature du demandeur</label>
-            <input type="text" name="demande[naturedemandeur]" value="{{ stepData.naturedemandeur ?? '' }}" class="form-control">
+            <select name="demande[naturedemandeur]" class="form-control" required>
+                <option value="">-- Sélectionnez --</option>
+                <option value="particulier" {{ (stepData.naturedemandeur|default('')) == 'particulier' ? 'selected' : '' }}>Particulier</option>
+                <option value="hotel" {{ (stepData.naturedemandeur|default('')) == 'hotel' ? 'selected' : '' }}>Hôtel</option>
+                <option value="centre_formation" {{ (stepData.naturedemandeur|default('')) == 'centre_formation' ? 'selected' : '' }}>Centre de formation</option>
+                <option value="Clinique/Hôpital" {{ (stepData.naturedemandeur|default('')) == 'Clinique/Hôpital' ? 'selected' : '' }}>Clinique/Hôpital</option>
+            </select>
         </div>
+
 
         <div class="mb-3">
             <label class="form-label">Adresse de la prestation</label>
