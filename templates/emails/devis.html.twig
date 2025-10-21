@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Votre devis HygieConnect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #266fc2;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .footer {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bonjour {{ nom }} !</h2>
+        <p>Merci d’avoir utilisé HygieConnect pour votre demande de service.</p>
+        <p>Voici votre devis : <strong>{{ devisNumero }}</strong></p>
+        <p>Montant total estimé : <strong>{{ total }} DT</strong></p>
+        <p>Le devis est joint en pièce jointe au format PDF.</p>
+
+        <div class="footer">
+            HygieConnect – Votre service, simplement.
+        </div>
+    </div>
+</body>
+</html>

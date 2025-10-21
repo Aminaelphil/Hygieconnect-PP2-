@@ -15,6 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class DemandeController extends AbstractController
 {
@@ -144,60 +148,97 @@ class DemandeController extends AbstractController
     /**
      * Étape 5 — Devis estimatif et enregistrement en base
      */
-    #[Route('/demande/etape-5', name: 'app_demande_etape5')]
-    public function etape5(SessionInterface $session, EntityManagerInterface $em): Response
-    {
-        $data = $session->get(self::WIZARD_KEY, []);
+#[Route('/demande/etape-5', name: 'app_demande_etape5')]
+public function etape5(SessionInterface $session, EntityManagerInterface $em, MailerInterface $mailer): Response
+{
+    $data = $session->get(self::WIZARD_KEY, []);
 
-        $selectedPrestations = $data['prestations'] ?? [];
-        $prestationsEntities = [];
+    $selectedPrestations = $data['prestations'] ?? [];
+    $prestationsEntities = [];
 
-        if (!empty($selectedPrestations)) {
-            $prestationsEntities = $this->prestationRepository->findBy(['id' => $selectedPrestations]);
-        }
-
-        // Calcul du total
-        $total = 0;
-        if (!empty($data['dateDebut']) && !empty($data['dateFin']) && !empty($prestationsEntities)) {
-            try {
-                $dDeb = new \DateTimeImmutable($data['dateDebut']);
-                $dFin = new \DateTimeImmutable($data['dateFin']);
-                $jours = $dDeb->diff($dFin)->days + 1;
-                foreach ($prestationsEntities as $p) {
-                    $total += ($p->getPrix() ?? 0) * $jours;
-                }
-            } catch (\Exception $e) {}
-        }
-
-        // --- Enregistrement de la demande pour avoir un ID ---
-        $demande = new Demande();
-        $demande->setDatedemande(new \DateTimeImmutable());
-        $demande->setDatedebut(!empty($data['dateDebut']) ? new \DateTimeImmutable($data['dateDebut']) : null);
-        $demande->setDatefin(!empty($data['dateFin']) ? new \DateTimeImmutable($data['dateFin']) : null);
-        $demande->setInfossupplementaires($data['infossupplementaires'] ?? null);
-        $demande->setNaturedemandeur($data['etape1']['naturedemandeur'] ?? null);
-        $demande->setAdresseprestation($data['etape1']['adresseprestation'] ?? null);
-        $demande->setDevisestime($total);
-        $demande->setStatut(Demande::STATUT_EN_ATTENTE);
-
-        foreach ($prestationsEntities as $p) {
-            $demande->addPrestation($p);
-        }
-
-        $em->persist($demande);
-        $em->flush();
-
-        // Numéro de devis basé sur l'ID
-        $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
-
-        return $this->render('demande/etape5.html.twig', [
-            'prestations' => $prestationsEntities,
-            'total' => $total,
-            'demande' => $demande,
-            'devisNumero' => $devisNumero,
-            'stepData' => $data,
-        ]);
+    if (!empty($selectedPrestations)) {
+        $prestationsEntities = $this->prestationRepository->findBy(['id' => $selectedPrestations]);
     }
+
+    // Calcul du total
+    $total = 0;
+    if (!empty($data['dateDebut']) && !empty($data['dateFin']) && !empty($prestationsEntities)) {
+        try {
+            $dDeb = new \DateTimeImmutable($data['dateDebut']);
+            $dFin = new \DateTimeImmutable($data['dateFin']);
+            $jours = $dDeb->diff($dFin)->days + 1;
+            foreach ($prestationsEntities as $p) {
+                $total += ($p->getPrix() ?? 0) * $jours;
+            }
+        } catch (\Exception $e) {}
+    }
+
+    // --- Enregistrement de la demande ---
+    $demande = new Demande();
+    $demande->setDatedemande(new \DateTimeImmutable());
+    $demande->setDatedebut(!empty($data['dateDebut']) ? new \DateTimeImmutable($data['dateDebut']) : null);
+    $demande->setDatefin(!empty($data['dateFin']) ? new \DateTimeImmutable($data['dateFin']) : null);
+    $demande->setInfossupplementaires($data['infossupplementaires'] ?? null);
+    $demande->setNaturedemandeur($data['etape1']['naturedemandeur'] ?? null);
+    $demande->setAdresseprestation($data['etape1']['adresseprestation'] ?? null);
+    $demande->setDevisestime($total);
+    $demande->setStatut(Demande::STATUT_EN_ATTENTE);
+
+    foreach ($prestationsEntities as $p) {
+        $demande->addPrestation($p);
+    }
+
+    $em->persist($demande);
+    $em->flush();
+
+    // Numéro de devis
+    $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
+
+    // --- Génération du PDF ---
+    $html = $this->renderView('demande/devis_pdf.html.twig', [
+        'prestations' => $prestationsEntities,
+        'total' => $total,
+        'demande' => $demande,
+        'devisNumero' => $devisNumero,
+        'isPdf' => true,
+        'nom' => $data['etape1']['nom'] ?? null,
+        'email' => $data['etape1']['email'] ?? null,
+        'telephone' => $data['etape1']['telephone'] ?? null,
+    ]);
+
+    $options = new \Dompdf\Options();
+    $options->set('defaultFont', 'Arial');
+    $dompdf = new \Dompdf\Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $pdfContent = $dompdf->output();
+
+    // --- Envoi de l'email avec PDF en pièce jointe ---
+    $email = (new \Symfony\Component\Mime\Email())
+        ->from(new \Symfony\Component\Mime\Address('no-reply@tonsite.com', 'HygieConnect'))
+        ->to($data['etape1']['email'])
+        ->subject("Votre devis HygieConnect - $devisNumero")
+        ->html($this->renderView('emails/devis.html.twig', [
+            'nom' => $data['etape1']['nom'] ?? null,
+            'devisNumero' => $devisNumero,
+            'total' => $total
+        ]))
+        ->attach($pdfContent, "devis-$devisNumero.pdf", 'application/pdf');
+
+    $mailer->send($email);
+
+    // --- Affichage du récap ---
+    return $this->render('demande/etape5.html.twig', [
+        'prestations' => $prestationsEntities,
+        'total' => $total,
+        'demande' => $demande,
+        'devisNumero' => $devisNumero,
+        'stepData' => $data,
+        'mailEnvoye' => true
+    ]);
+}
 
     /**
      * Récupération dynamique des prestations par catégorie (AJAX)
