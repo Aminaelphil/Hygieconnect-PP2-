@@ -1,0 +1,164 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f7f6;
+        overflow-x: hidden;
+        position: relative;
+        height: 100vh;
+    }
+
+    /* Vagues animées uniquement bleu */
+    .wave {
+        position: absolute;
+        width: 200%;
+        height: 100%;
+        left: -50%;
+        top: 0;
+        background: linear-gradient(135deg, #0f76fd 20%, #63a7ff 80%);
+        opacity: 0.3;
+        border-radius: 43% 57% 59% 41% / 36% 42% 58% 64%;
+        animation: waveMove 10s linear infinite;
+        z-index: -1;
+    }
+
+    .wave.wave2 {
+        animation-duration: 15s;
+        background: linear-gradient(135deg, #055ed1 20%, #0f76fd 80%);
+        opacity: 0.25;
+    }
+
+    @keyframes waveMove {
+        0% {
+            transform: translateX(0) translateY(0) rotate(0deg);
+        }
+        50% {
+            transform: translateX(25%) translateY(-10px) rotate(2deg);
+        }
+        100% {
+            transform: translateX(0) translateY(0) rotate(0deg);
+        }
+    }
+
+    .card-registration {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        padding: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    h2 {
+        font-weight: 600;
+        color: #0f76fd;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-icon-wrapper i {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: #adb5bd;
+    }
+
+    .input-icon-wrapper input {
+        padding-left: 2.5rem;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        height: 45px;
+        transition: all 0.3s ease;
+    }
+
+    .input-icon-wrapper input:focus {
+        border-color: #0f76fd;
+        box-shadow: 0 0 0 0.2rem rgba(15, 118, 253, 0.15);
+    }
+
+    .btn-register {
+        background-color: #0f76fd;
+        color: white;
+        font-weight: 500;
+        border-radius: 8px;
+        height: 45px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-register:hover {
+        background-color: #055ed1;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="wave"></div>
+<div class="wave wave2"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card card-registration">
+                <h2>Inscription</h2>
+
+                {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-envelope"></i>
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Email'}}) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-lock"></i>
+                    {{ form_widget(registrationForm.password, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
+                    {{ form_errors(registrationForm.password) }}
+                </div>
+
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-person"></i>
+                    {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                    {{ form_errors(registrationForm.nom) }}
+                </div>
+
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-person-badge"></i>
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+                </div>
+
+                <div class="input-icon-wrapper">
+                    <i class="bi bi-telephone"></i>
+                    {{ form_widget(registrationForm.telephone, {'attr': {'class': 'form-control', 'placeholder': 'Téléphone'}}) }}
+                    {{ form_errors(registrationForm.telephone) }}
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-register">S’inscrire</button>
+                </div>
+
+                {{ form_end(registrationForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+{% endblock %}

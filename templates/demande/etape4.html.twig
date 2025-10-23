@@ -29,7 +29,7 @@
                 value="{{ stepData.dateDebut ?? '' }}" 
                 class="form-control" 
                 required
-                min="{{ 'now'|date('d/m/Y') }}" 
+                min="{{ 'now'|date('Y-m-d') }}" 
             >
         </div>
 
@@ -41,7 +41,7 @@
                 value="{{ stepData.dateFin ?? '' }}" 
                 class="form-control" 
                 required
-                min="{{ 'now'|date('d/m/Y') }}"  
+                min="{{ 'now'|date('Y-m-d') }}"  
             >
         </div>
 

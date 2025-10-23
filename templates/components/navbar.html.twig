@@ -6,9 +6,9 @@
 
 <nav class="navbar navbar-expand-lg glass-navbar sticky-top">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="#">
+        <a class="navbar-brand d-flex align-items-center" href="{{ path('app_home') }}">
             <i class="bi bi-droplet-fill text-primary fs-3 me-2"></i>
-            <span class="fw-bold text-primary" href="{{ path('app_home') }}">HygieConnect</span>
+            <span class="fw-bold text-primary">HygieConnect</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -24,7 +24,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('app_formations') }}">Formations</a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="#">Audits</a>
                 </li>
@@ -34,6 +33,28 @@
                 <li class="nav-item ms-2">
                     <a class="btn btn-primary btn-sm px-4" href="{{ path('app_demande_new', {'new': 1}) }}">Demande de service</a>
                 </li>
+
+                {# Bloc utilisateur connecté / non connecté #}
+                {% if app.user %}
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i>{{ app.user.nom }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href=#>Mon compte</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-dark" href="{{ path('app_logout') }}">
+                                    Déconnexion
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-dark btn-sm px-4" href="{{ path('app_login') }}">Connexion</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>

@@ -38,7 +38,7 @@ class DemandeType extends AbstractType
                 'html5' => true,
                 'label' => 'Date de début',
                 'attr' => [
-                    'min' => (new \DateTime('today'))->format('d/m/Y'), // interdit les dates avant aujourd'hui
+                    'min' => (new \DateTime('today'))->format('Y-m-d'), 
                 ],
             ])
             ->add('dateFin', DateType::class, [
@@ -46,7 +46,7 @@ class DemandeType extends AbstractType
                 'html5' => true,
                 'label' => 'Date de fin',
                 'attr' => [
-                    'min' => (new \DateTime('today'))->format('d/m/Y'), // interdit les dates avant aujourd'hui
+                    'min' => (new \DateTime('today'))->format('Y-m-d'),
                 ],
             ])
 
