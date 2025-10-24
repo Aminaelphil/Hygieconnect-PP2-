@@ -69,9 +69,21 @@
             <a href="{{ path('app_demande_etape4') }}" class="btn btn-dark">Retour</a>
             <a href="{{ path('app_demande_new') }}" class="btn btn-primary">Recommencer</a>
         <a href="{{ path('app_demande_pdf', {'id': demande.id}) }}" class="btn btn-dark" target="_blank">Télécharger le devis en PDF</a>
+        {% if app.user %}
+            <!-- L'utilisateur est connecté : bouton pour confirmer -->
+            <form method="post" action="{{ path('app_demande_confirmer') }}">
+                <button type="submit" class="btn btn-success mt-3">Confirmer la demande</button>
+            </form>
+        {% else %}
+            <a href="{{ path('app_login', {'redirectTo': path('app_demande_confirmer')}) }}" class="btn btn-primary mt-3">
+                Se connecter pour confirmer
+            </a>
+
+        {% endif %}
 
 
         </div>
     </div>
 </div>
+
 {% endblock %}

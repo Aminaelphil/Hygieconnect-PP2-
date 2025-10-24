@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Demande confirmée{% endblock %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    <div class="alert alert-success">
+        <h3>Votre demande a bien été confirmée !</h3>
+        <p>Elle est maintenant en cours de traitement par le formateur.</p>
+        <p><strong>Numéro de devis : </strong>{{demande.id}}</p>
+    </div>
+    <a href="{{ path('app_home') }}" class="btn btn-primary mt-3">Retour à l'accueil</a>
+</div>
+{% endblock %}

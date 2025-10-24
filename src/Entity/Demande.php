@@ -13,6 +13,7 @@ class Demande
 {
         // --- Statuts possibles pour la demande ---
     const STATUT_EN_ATTENTE = 'en attente';
+    const STATUT_EN_COURS = 'en cours';
     const STATUT_ACCEPTEE   = 'acceptée';
     const STATUT_REFUSEE    = 'refusée';
     

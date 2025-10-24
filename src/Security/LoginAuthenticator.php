@@ -3,6 +3,8 @@
 namespace App\Security;
 
 use App\Repository\UserRepository;
+use App\Entity\Demande;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,17 +26,26 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
+    private UrlGeneratorInterface $urlGenerator;
+    private UserRepository $userRepository;
+    private EntityManagerInterface $em;
+
     public function __construct(
-        private UrlGeneratorInterface $urlGenerator,
-        private UserRepository $userRepository
-    ) {}
+        UrlGeneratorInterface $urlGenerator,
+        UserRepository $userRepository,
+        EntityManagerInterface $em
+    ) {
+        $this->urlGenerator = $urlGenerator;
+        $this->userRepository = $userRepository;
+        $this->em = $em;
+    }
 
     public function authenticate(Request $request): Passport
     {
         $email = $request->request->get('email', '');
         $password = $request->request->get('password', '');
 
-        // Stocke le dernier email pour pré-remplir le formulaire
+        // Sauvegarde du dernier email pour pré-remplir le formulaire
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
@@ -45,7 +56,7 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
                     throw new CustomUserMessageAuthenticationException('Utilisateur introuvable.');
                 }
 
-                return $user; // Obligatoire !
+                return $user;
             }),
             new PasswordCredentials($password),
             [
@@ -54,14 +65,42 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
+public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+{
+    $session = $request->getSession();
+    $user = $token->getUser();
 
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
+    // Vérifie si une demande est en attente dans la session
+    $wizardData = $session->get('demande_wizard', []);
+    if (!empty($wizardData['demande_id'])) {
+        $demande = $this->em->getRepository(Demande::class)->find($wizardData['demande_id']);
+
+        if ($demande && !$demande->getUser()) {
+            // Rattachement automatique
+            $demande->setUser($user);
+            $demande->setStatut(Demande::STATUT_EN_COURS);
+
+            $this->em->persist($demande);
+            $this->em->flush();
+
+            // Nettoyage session pour éviter le doublon
+            unset($wizardData['demande_id']);
+            $session->set('demande_wizard', $wizardData);
+
+            // ✅ Rediriger directement vers la confirmation
+            return new RedirectResponse($this->urlGenerator->generate('app_demande_confirmer'));
+        }
     }
+
+    // ➡️ Si aucune demande à confirmer, comportement normal
+    // (ne touche rien ici)
+    if ($targetPath = $this->getTargetPath($session, $firewallName)) {
+        return new RedirectResponse($targetPath);
+    }
+
+    // Sinon retour à l’accueil par défaut
+    return new RedirectResponse($this->urlGenerator->generate('app_home'));
+}
 
     protected function getLoginUrl(Request $request): string
     {
