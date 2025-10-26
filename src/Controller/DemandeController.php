@@ -193,7 +193,7 @@ public function etape5(
     $em->persist($demande);
     $em->flush();
 
-    // 🔒 Stocker l'ID de la demande dans la session (pour rattachement après login)
+    // Stocker l'ID de la demande dans la session (pour rattachement après login)
     $data['demande_id'] = $demande->getId();
     $session->set(self::WIZARD_KEY, $data);
 
@@ -245,11 +245,10 @@ public function etape5(
     ]);
 }
 
-
 // -------------------------
 // Confirmation de la demande après login
 // -------------------------
-#[Route('/demande/confirmer', name: 'app_demande_confirmer', methods: ['GET'])]
+#[Route('/demande/confirmer', name: 'app_demande_confirmer')]
 public function confirmer(SessionInterface $session, EntityManagerInterface $em): Response
 {
     $data = $session->get(self::WIZARD_KEY, []);
@@ -274,7 +273,7 @@ public function confirmer(SessionInterface $session, EntityManagerInterface $em)
         return $this->redirectToRoute('app_login');
     }
 
-    // 🔗 Rattache la demande à l’utilisateur
+    //  Rattache la demande à l’utilisateur
     $demande->setUser($user);
     $demande->setStatut(Demande::STATUT_EN_COURS);
 

@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nos Formations{% endblock %}
+{% block title %}Nos Audits{% endblock %}
 
 {% block body %}
 <style>
 /* === HERO SECTION === */
 .hero {
   background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.35)), 
-              url('{{ asset('images/back2.jpg') }}') center/cover fixed;
+              url('{{ asset('images/back5.jpg') }}') center/cover fixed;
   color: white;
   text-align: center;
   padding: 100px 20px;
@@ -74,6 +74,7 @@ h2.section-title:after {
 }
 
 /* === SECTION EXPLICATION === */
+
 .explanation {
   text-align: center;
   font-size: 1.1rem;
@@ -104,7 +105,6 @@ h2.section-title:after {
   border-bottom: 1px solid #eee;
   width: 100%;
   display: block;
-  position: relative;
 }
 
 /* === BADGES SUR IMAGE === */
@@ -146,21 +146,11 @@ h2.section-title:after {
   color: #0d6efd;
   margin-top: 10px;
 }
-.modules-list {
-  list-style: none;
-  padding-left: 0;
-  font-size: 0.9rem;
-  margin-top: 10px;
-}
-.modules-list li {
-  margin-bottom: 6px;
-  line-height: 1.4;
+.audit-description {
+  font-size: 0.95rem;
   color: #333;
-}
-
-/* === LARGEUR SPÉCIALE POUR DERNIÈRE CARD === */
-.card-wide {
-  grid-column: span 12 !important;
+  margin-top: 8px;
+  line-height: 1.5;
 }
 
 /* === ANIMATION D'APPARITION === */
@@ -204,64 +194,42 @@ h2.section-title:after {
 
 <!-- HERO SECTION -->
 <section class="hero">
-  <h1>Formations Professionnelles</h1>
-  <p>Développez vos compétences grâce à nos programmes conçus par notre expert du terrain.</p>
-  <a href="{{ path('app_demande_new') }}" class="btn-gradient">Demander une formation</a>
+  <h1>Nos Audits</h1>
+  <p>Évaluation complète par notre expert pour maîtriser les risques et améliorer vos pratiques.</p>
+  <a href="{{ path('app_demande_new') }}" class="btn-gradient">Demander un audit</a>
 </section>
 
 <!-- EXPLICATION -->
 <section class="container py-5">
-  <h2 class="section-title">Qu’est-ce qu’une formation ?</h2>
+  <h2 class="section-title">Qu’est-ce qu’un audit ?</h2>
   <div class="explanation">
-    Une formation est un <strong>processus d’apprentissage</strong> qui allie théorie et pratique.  
-    Elle vise à <strong>développer les compétences</strong>, à <strong>acquérir des connaissances</strong> 
-    et à <strong>maîtriser des notions théoriques essentielles</strong> pour mieux comprendre et 
-    appliquer les pratiques professionnelles sur le terrain.  
+    Un audit est une <strong>vérification et évaluation</strong> réalisée par notre expert.  
+    Il permet d’identifier les risques, de mesurer la conformité et d’attribuer un <strong>score en pourcentage</strong> pour mieux piloter vos installations et pratiques professionnelles.
   </div>
 </section>
 
-<!-- FORMATIONS -->
+<!-- AUDITS -->
 <section class="container pb-4">
   <div class="row g-4">
-    {% set formations = [
-      {'titre': 'Prévention et traitement des légionelles', 'description': 'Gestion de la qualité des eaux sanitaires.', 'jours': 3, 'prix': 480, 'image': 'formation1.jpg'},
-      {'titre': 'Gestion de la qualité des eaux de piscines', 'description': 'Formation sur la réglementation et la qualité de l’eau.', 'jours': 2, 'prix': 350, 'note': '3 j avec formation pratique sur site', 'image': 'formation2.jpg'},
-      {'titre': 'Auto diagnostic et audit interne', 'description': 'Apprenez à évaluer vos installations et procédures.', 'jours': 3, 'prix': 420, 'image': 'formation3.jpg'},
-      {'titre': 'Maintenance préventive par secteur spécifique', 'description': 'Cuisines, restaurants, locaux techniques.', 'jours': 2, 'prix': 390, 'image': 'formation4.jpg'},
-      {'titre': 'Hygiène des chambres (hébergement)', 'description': 'Renforcez la propreté et la sécurité sanitaire.', 'jours': 1, 'prix': 280, 'note': '1/2 journée par groupe', 'image': 'formation5.jpg'},
-      {'titre': 'Bonnes pratiques d\'hygiène dans les centres SPA / Thalassothérapie', 'description': 'Optimisez vos protocoles sanitaires dans les centres de bien-être.', 'jours': 2, 'prix': 350, 'image': 'formation6.jpg'},
-      {'titre': 'Hygiène de base (BPH) dans la restauration collective', 'description': 'Formation complète en 6 modules.', 'jours': 3, 'prix': 550, 'modules': [
-        'Hygiène du personnel et du comportement',
-        'Hygiène des surfaces et des équipements',
-        'Contrôle et gestion des matières premières',
-        'Organisation du travail et hygiène des préparations',
-        'Hygiène des buffets et maîtrise des points critiques',
-        'Prévention des TIAC – Méthode HACCP et 5 M'
-      ], 'image': 'back1.jpg'}
+    {% set audits = [
+      {'titre': 'Réalisation d\'audit biotechnique relatif à la prévention des légionelles', 'jours': 2, 'prix': 350, 'image': 'formation3.jpg', 'description': 'Évaluation des installations et protocoles pour prévenir les légionelles.'},
+      {'titre': 'Réalisation d\'audit en hygiène alimentaire', 'jours': 2, 'prix': 300, 'image': 'formation2.jpg', 'description': 'Vérification des pratiques alimentaires et respect des normes d’hygiène.'},
+      {'titre': 'Réalisation de diagnostic technique des installations de production et de stockage de l’eau chaude et froide sanitaires et des installations d’air conditionné pour la maîtrise de leurs points critiques', 'jours': '2 à 4', 'prix': 400, 'image': 'formation1.jpg', 'description': 'Analyse complète des installations techniques et maîtrise des points critiques.'}
     ] %}
 
-    {% for formation in formations %}
-      {% set isWide = formation.titre == 'Hygiène de base (BPH) dans la restauration collective' %}
-      <div class="col-md-6 {{ isWide ? 'col-lg-12' : 'col-lg-4' }} animate-card">
-        <div class="card modern-card h-100 {{ isWide ? 'card-wide' : '' }}">
+    {% for audit in audits %}
+      <div class="col-md-6 col-lg-4 animate-card">
+        <div class="card modern-card h-100">
           <div class="position-relative">
-            <img src="{{ asset('images/' ~ formation.image) }}" class="card-img-top" alt="{{ formation.titre }}">
+            <img src="{{ asset('images/' ~ audit.image) }}" class="card-img-top" alt="{{ audit.titre }}">
             <div class="badge-container">
-              <span class="badge badge-gradient">{{ formation.jours }} jour{{ formation.jours > 1 ? 's' : '' }}</span>
-              <span class="badge badge-price">{{ formation.prix }} DT</span>
+              <span class="badge badge-gradient">{{ audit.jours }} jour{{ audit.jours|default(1) > 1 ? 's' : '' }}</span>
+              <span class="badge badge-price">{{ audit.prix }} DT</span>
             </div>
           </div>
           <div class="card-body">
-            <h5 class="card-title mt-3">{{ formation.titre }}</h5>
-            {% if formation.modules is defined %}
-              <ul class="modules-list">
-                {% for module in formation.modules %}
-                  <li>• {{ module }}</li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p class="mt-2">{{ formation.description }}</p>
-            {% endif %}
+            <h5 class="card-title mt-3">{{ audit.titre }}</h5>
+            <p class="audit-description">{{ audit.description }}</p>
           </div>
         </div>
       </div>
@@ -271,8 +239,8 @@ h2.section-title:after {
 
 <!-- FOOTER CTA -->
 <section class="footer-cta">
-  <h3>Besoin d'une formation sur mesure ?</h3>
-  <p>Notre expert conçoit des programmes adaptés à vos besoins et à votre environnement de travail.</p>
+  <h3>Besoin d’un audit personnalisé ?</h3>
+  <p>Notre expert vous accompagne pour sécuriser vos installations et optimiser vos procédures.</p>
   <a href="{{ path('app_demande_new') }}" class="btn">Contactez-nous</a>
 </section>
 
