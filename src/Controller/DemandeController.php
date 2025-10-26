@@ -269,51 +269,61 @@ public function etape5(
         'mailEnvoye' => true,
     ]);
 }
-
 // -------------------------
 // Confirmation de la demande après login
 // -------------------------
 #[Route('/demande/confirmer', name: 'app_demande_confirmer')]
 public function confirmer(SessionInterface $session, EntityManagerInterface $em): Response
 {
-    $data = $session->get(self::WIZARD_KEY, []);
-
-    // Vérifie si une demande a été sauvegardée
-    if (empty($data['demande_id'])) {
-        $this->addFlash('warning', 'Aucune demande à confirmer.');
-        return $this->redirectToRoute('app_demande_new');
-    }
-
-    // Recherche la demande correspondante
-    $demande = $em->getRepository(Demande::class)->find($data['demande_id']);
-    if (!$demande) {
-        $this->addFlash('warning', 'Demande introuvable.');
-        return $this->redirectToRoute('app_demande_new');
-    }
-
-    // Vérifie si l’utilisateur est connecté
     $user = $this->getUser();
+
+    // Récupération de l'ID de la demande en session
+    $data = $session->get(self::WIZARD_KEY, []);
+    $demandeId = $data['demande_id'] ?? null;
+
+    // Si utilisateur non connecté, stocker l'URL de redirection et forcer login
     if (!$user) {
+        $session->set('redirect_after_login', $this->generateUrl('app_demande_confirmer'));
         $this->addFlash('warning', 'Veuillez vous connecter pour confirmer votre demande.');
         return $this->redirectToRoute('app_login');
     }
 
-    //  Rattache la demande à l’utilisateur
-    $demande->setUser($user);
-    $demande->setStatut(Demande::STATUT_EN_COURS);
+    $demande = null;
+    if ($demandeId) {
+        $demande = $em->getRepository(Demande::class)->find($demandeId);
+    }
 
-    $em->persist($demande);
-    $em->flush();
+    // Si aucune demande trouvée en session, chercher la dernière demande non rattachée
+    if (!$demande) {
+        $demande = $em->getRepository(Demande::class)->findOneBy(['user' => null], ['id' => 'DESC']);
+    }
 
-    // Supprime l’ID de la session pour éviter les doublons
+    // Si toujours aucune demande, afficher la page confirmation avec null
+    if (!$demande) {
+        // On peut afficher un message sur la page confirmation plutôt que de rediriger
+        
+        return $this->render('demande/confirmation.html.twig', [
+            'demande' => null
+        ]);
+    }
+
+    // Rattacher la demande si nécessaire
+    if ($demande->getUser() === null) {
+        $demande->setUser($user);
+        $demande->setStatut(Demande::STATUT_EN_COURS);
+        $em->persist($demande);
+        $em->flush();
+    }
+
+    // Supprimer l’ID de la session
     unset($data['demande_id']);
     $session->set(self::WIZARD_KEY, $data);
 
-    // Affiche la page de confirmation
     return $this->render('demande/confirmation.html.twig', [
-        'demande' => $demande,
+        'demande' => $demande
     ]);
 }
+
 
     // -------------------------
     // Récupération prestations par catégorie (AJAX)
@@ -366,4 +376,23 @@ public function confirmer(SessionInterface $session, EntityManagerInterface $em)
             'Content-Disposition' => 'attachment; filename="devis.pdf"',
         ]);
     }
+    #[Route('/mes-demandes', name: 'app_mes_demandes')]
+        public function mesDemandes(EntityManagerInterface $em): Response
+        {
+            $user = $this->getUser();
+            if (!$user) {
+                $this->addFlash('warning', 'Vous devez être connecté pour consulter vos demandes.');
+                return $this->redirectToRoute('app_login');
+            }
+
+            $demandes = $em->getRepository(Demande::class)->findBy(
+                ['user' => $user],
+                ['datedemande' => 'DESC']
+            );
+
+            return $this->render('demande/mes_demandes.html.twig', [
+                'demandes' => $demandes,
+            ]);
+        }
+
 }

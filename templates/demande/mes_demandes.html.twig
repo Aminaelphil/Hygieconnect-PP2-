@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes demandes{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2>Mes demandes</h2>
+
+    {% if demandes is empty %}
+        <p>Vous n'avez encore créé aucune demande.</p>
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N° demande</th>
+                    <th>Date de la demande</th>
+                    <th>Statut</th>
+                    <th>Devis</th>
+                    <th>Détails</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demande in demandes %}
+                    <tr>
+                        <td>{{ demande.id }}</td>
+                        <td>{{ demande.datedemande|date('d/m/Y H:i') }}</td>
+                        <td>{{ demande.statut }}</td>
+                        <td>
+                            {% if demande.devisestime %}
+                                <a href="{{ path('app_demande_pdf', {'id': demande.id}) }}" class="btn btn-sm btn-primary" target="_blank">
+                                    Télécharger
+                                </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ demande.id }}">
+                                Voir détails
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="collapse" id="details-{{ demande.id }}">
+                        <td colspan="5">
+                            <strong>Prestations :</strong>
+                            <ul>
+                                {% for prestation in demande.prestations %}
+                                    <li>{{ prestation.titre }} - {{ prestation.prix }} € / jour</li>
+                                {% endfor %}
+                            </ul>
+                            <p><strong>Adresse prestation :</strong> {{ demande.adresseprestation }}</p>
+                            <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur }}</p>
+                            <p><strong>Date début :</strong> {{ demande.datedebut ? demande.datedebut|date('d/m/Y') : '-' }}</p>
+                            <p><strong>Date fin :</strong> {{ demande.datefin ? demande.datefin|date('d/m/Y') : '-' }}</p>
+                            <p><strong>Infos supplémentaires :</strong> {{ demande.infossupplementaires }}</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
