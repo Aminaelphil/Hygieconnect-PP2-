@@ -20,18 +20,24 @@
         <h2>Étape 1 — Informations du demandeur</h2>
 
         <div class="mb-3">
-            <label class="form-label">Nom complet</label>
-            <input type="text" name="demande[nom]" value="{{ stepData.nom ?? '' }}" class="form-control" required>
+            <label class="form-label">Prénom</label>
+            <input type="text" name="demande[prenom]" value="{{ stepData.prenom ?? '' }}" class="form-control" required {% if userConnected %}readonly{% endif %}>
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Nom</label>
+            <input type="text" name="demande[nom]" value="{{ stepData.nom ?? '' }}" class="form-control" required {% if userConnected %}readonly{% endif %}>
+        </div>
+
+
+        <div class="mb-3">
             <label class="form-label">Adresse e-mail</label>
-            <input type="email" name="demande[email]" value="{{ stepData.email ?? '' }}" class="form-control" required>
+            <input type="email" name="demande[email]" value="{{ stepData.email ?? '' }}" class="form-control" required {% if userConnected %}readonly{% endif %}>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Numéro de téléphone</label>
-            <input type="text" name="demande[telephone]" value="{{ stepData.telephone ?? '' }}" class="form-control" required>
+            <input type="text" name="demande[telephone]" value="{{ stepData.telephone ?? '' }}" class="form-control" required {% if userConnected %}readonly{% endif %}>
         </div>
         <div class="mb-3">
             <label class="form-label">Nature du demandeur</label>

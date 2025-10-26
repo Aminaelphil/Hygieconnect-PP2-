@@ -1,0 +1,186 @@
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+}
+.hero p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 20px auto;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+.btn-gradient {
+  background: linear-gradient(135deg, #0d6efd, #00aaff);
+  color: #fff;
+  border-radius: 30px;
+  padding: 12px 28px;
+  font-weight: 600;
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-decoration: none;
+}
+.btn-gradient:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,123,255,0.3);
+}
+
+/* === TITRE PRINCIPAL === */
+h2.section-title {
+  position: relative;
+  font-family: "Raleway", sans-serif;
+  font-weight: 300;
+  font-size: 38px;
+  color: #080808;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 60px;
+}
+h2.section-title:before {
+  content: "";
+  width: 30px;
+  height: 5px;
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0d6efd;
+  border-radius: 2px;
+}
+h2.section-title:after {
+  content: "";
+  width: 110px;
+  height: 2px;
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0078ff;
+  opacity: 0.8;
+}
+
+/* === SECTION EXPLICATION === */
+.explanation {
+  text-align: center;
+  font-size: 1.1rem;
+  max-width: 850px;
+  margin: 0 auto 30px auto; /* réduit l'espace de 70px à 30px */
+  color: #333;
+  line-height: 1.7;
+}
+
+
+/* === STRUCTURE DES CARTES === */
+.modern-card {
+  background: #ffffff;
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+}
+.modern-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,123,255,0.25);
+}
+.modern-card img {
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* === BADGES SUR IMAGE === */
+.badge-container {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.badge-gradient {
+  background: linear-gradient(135deg, #0d6efd, #00aaff);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+.badge-price {
+  background: linear-gradient(135deg, #0078ff, #00bfff);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* === CONTENU DES CARTES === */
+.card-body {
+  padding: 20px;
+}
+.card-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #0d6efd;
+  margin-top: 10px;
+}
+.modules-list {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+.modules-list li {
+  margin-bottom: 6px;
+  line-height: 1.4;
+  color: #333;
+}
+
+/* === LARGEUR SPÉCIALE POUR DERNIÈRE CARD === */
+.card-wide {
+  grid-column: span 12 !important;
+}
+
+/* === ANIMATION D'APPARITION === */
+.animate-card {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: all 0.6s ease;
+}
+.animate-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === FOOTER CTA === */
+.footer-cta {
+  background: linear-gradient(135deg, #0062cc, #00c6ff);
+  color: white;
+  text-align: center;
+  padding: 70px 20px;
+}
+.footer-cta h3 {
+  font-weight: 700;
+}
+.footer-cta p {
+  font-size: 1.1rem;
+}
+.footer-cta .btn {
+  background: white;
+  color: #0062cc;
+  font-weight: 600;
+  border-radius: 30px;
+  padding: 10px 25px;
+  transition: all 0.3s ease;
+}
+.footer-cta .btn:hover {
+  background: #004a99;
+  color: white;
+  transform: translateY(-3px);
+}

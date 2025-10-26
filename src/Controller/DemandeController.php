@@ -36,33 +36,58 @@ class DemandeController extends AbstractController
     // -------------------------
     // Étape 1 — Informations du demandeur
     // -------------------------
-    #[Route('/demande/etape-1', name: 'app_demande_new')]
-    public function etape1(Request $request, SessionInterface $session): Response
-    {
-        if ($request->query->get('new') === '1') {
-            $session->remove(self::WIZARD_KEY);
-        }
-
-        $data = $session->get(self::WIZARD_KEY, []);
-
-        if ($request->isMethod('POST')) {
-            $posted = $request->request->all('demande');
-            $data['etape1'] = [
-                'nom' => $posted['nom'] ?? null,
-                'email' => $posted['email'] ?? null,
-                'telephone' => $posted['telephone'] ?? null,
-                'naturedemandeur' => $posted['naturedemandeur'] ?? null,
-                'adresseprestation' => $posted['adresseprestation'] ?? null,
-            ];
-            $session->set(self::WIZARD_KEY, $data);
-
-            return $this->redirectToRoute('app_demande_etape2');
-        }
-
-        return $this->render('demande/etape1.html.twig', [
-            'stepData' => $data['etape1'] ?? [],
-        ]);
+#[Route('/demande/etape-1', name: 'app_demande_new')]
+public function etape1(Request $request, SessionInterface $session): Response
+{
+    // Si on démarre une nouvelle demande, on supprime les données de session
+    if ($request->query->get('new') === '1') {
+        $session->remove(self::WIZARD_KEY);
     }
+
+    // Récupération des données de la session
+    $data = $session->get(self::WIZARD_KEY, []);
+    $stepData = $data['etape1'] ?? [];
+
+    // Vérifie si l'utilisateur est connecté
+    $user = $this->getUser();
+    if ($user) {
+        // Préremplissage depuis l'utilisateur connecté
+        $stepData['prenom'] = $user->getPrenom() ?? $stepData['prenom'] ?? '';
+        $stepData['nom'] = $user->getNom() ?? $stepData['nom'] ?? '';
+        $stepData['email'] = $user->getEmail() ?? $stepData['email'] ?? '';
+        $stepData['telephone'] = $user->getTelephone() ?? $stepData['telephone'] ?? '';
+    }
+
+    // Traitement du formulaire POST
+    if ($request->isMethod('POST')) {
+        $posted = $request->request->all('demande');
+
+        // Si l'utilisateur n'est pas connecté, autoriser la saisie des informations personnelles
+        if (!$user) {
+            $stepData['prenom'] = $posted['prenom'] ?? null;
+            $stepData['nom'] = $posted['nom'] ?? null;
+            $stepData['email'] = $posted['email'] ?? null;
+            $stepData['telephone'] = $posted['telephone'] ?? null;
+        }
+
+        // Toujours récupérer ces champs
+        $stepData['naturedemandeur'] = $posted['naturedemandeur'] ?? null;
+        $stepData['adresseprestation'] = $posted['adresseprestation'] ?? null;
+
+        // Sauvegarde dans la session
+        $data['etape1'] = $stepData;
+        $session->set(self::WIZARD_KEY, $data);
+
+        // Redirection vers l'étape 2
+        return $this->redirectToRoute('app_demande_etape2');
+    }
+
+    // Rendu du template
+    return $this->render('demande/etape1.html.twig', [
+        'stepData' => $stepData,
+        'userConnected' => $user !== null,
+    ]);
+}
 
     // -------------------------
     // Étape 2 — Choix de la catégorie
