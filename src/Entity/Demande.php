@@ -16,6 +16,7 @@ class Demande
     const STATUT_EN_COURS = 'en cours';
     const STATUT_ACCEPTEE   = 'acceptée';
     const STATUT_REFUSEE    = 'refusée';
+    const STATUT_ANNULEE = 'annulée';
     
     #[ORM\Id]
     #[ORM\GeneratedValue]

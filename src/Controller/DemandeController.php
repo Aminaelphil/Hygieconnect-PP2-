@@ -88,7 +88,6 @@ public function etape1(Request $request, SessionInterface $session): Response
         'userConnected' => $user !== null,
     ]);
 }
-
     // -------------------------
     // Étape 2 — Choix de la catégorie
     // -------------------------
@@ -394,5 +393,34 @@ public function confirmer(SessionInterface $session, EntityManagerInterface $em)
                 'demandes' => $demandes,
             ]);
         }
+
+        #[Route('/demande/annuler/{id}', name: 'app_demande_annuler', methods: ['POST', 'GET'])]
+            public function annuler(int $id,EntityManagerInterface $em): Response {
+                $user = $this->getUser();
+
+                if (!$user) {
+                    $this->addFlash('warning', 'Vous devez être connecté pour effectuer cette action.');
+                    return $this->redirectToRoute('app_login');
+                }
+
+                $demande = $em->getRepository(Demande::class)->find($id);
+
+                if (!$demande) {
+                    $this->addFlash('danger', 'Demande introuvable.');
+                    return $this->redirectToRoute('app_mes_demandes');
+                }
+
+                if ($demande->getUser() !== $user) {
+                    $this->addFlash('danger', 'Vous ne pouvez pas annuler cette demande.');
+                    return $this->redirectToRoute('app_mes_demandes');
+                }
+
+                $demande->setStatut(Demande::STATUT_ANNULEE);
+                $em->flush();
+
+                $this->addFlash('success', 'Votre demande a bien été annulée.');
+                return $this->redirectToRoute('app_mes_demandes');
+            }
+
 
 }

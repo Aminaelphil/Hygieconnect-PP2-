@@ -166,13 +166,13 @@
 /* Bouton spécial */
 .custom-btn,
 .btn-h {
-    background-color: #0097B2;
+    background-color: #2c77ce;
     color: #ffffff;
 }
 
 .btn-h:hover,
 .custom-btn:hover {
-    background-color: #053139;
+    background-color: #3b7bdb;
     animation: colorChange 0.5s infinite alternate;
 }
 
