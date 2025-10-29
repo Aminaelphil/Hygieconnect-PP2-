@@ -34,6 +34,15 @@
                     <a class="btn btn-primary btn-sm px-4" href="{{ path('app_demande_new', {'new': 1}) }}">Demande de service</a>
                 </li>
 
+                {# Lien Dashboard uniquement pour les admins #}
+                {% if app.user and is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-success btn-sm px-4" href="{{ path('admin') }}">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                {% endif %}
+
                 {# Bloc utilisateur connecté / non connecté #}
                 {% if app.user %}
                     <li class="nav-item dropdown ms-3">
@@ -41,9 +50,8 @@
                             <i class="bi bi-person-circle me-1"></i>{{ app.user.nom }} {{ app.user.prenom }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                             <li><a class="dropdown-item" href="{{ path('app_profile') }}">Mon profil</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_profile') }}">Mon profil</a></li>
                             <li><a class="dropdown-item" href="{{ path('app_mes_demandes') }}">Mes demandes</a></li>
-
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-light btn-danger" href="{{ path('app_logout') }}">

@@ -87,17 +87,19 @@ public function onAuthenticationSuccess(Request $request, TokenInterface $token,
             unset($wizardData['demande_id']);
             $session->set('demande_wizard', $wizardData);
 
-            // ✅ Rediriger directement vers la confirmation
+            //  Rediriger directement vers la confirmation
             return new RedirectResponse($this->urlGenerator->generate('app_demande_confirmer'));
         }
     }
 
-    // ➡️ Si aucune demande à confirmer, comportement normal
-    // (ne touche rien ici)
+    //  Si aucune demande à confirmer, comportement normal
     if ($targetPath = $this->getTargetPath($session, $firewallName)) {
         return new RedirectResponse($targetPath);
     }
-
+    //  Si l’utilisateur est un administrateur, on le redirige vers le dashboard
+    if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        return new RedirectResponse($this->urlGenerator->generate('admin'));
+    }
     // Sinon retour à l’accueil par défaut
     return new RedirectResponse($this->urlGenerator->generate('app_home'));
 }
