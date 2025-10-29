@@ -71,8 +71,6 @@ class DemandeCrudController extends AbstractCrudController
             ->add('index', $refuser)
             ->add('index', $annuler);
     }
-
-    // --- Actions personnalisées pour EasyAdmin ---
     public function accepterDemande(AdminContext $context): RedirectResponse
     {
         $demande = $context->getEntity()->getInstance();

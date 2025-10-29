@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Toutes les demandes{% endblock %}
+
+{% block body %}
+<div class="container py-5" style=" min-height:100vh;">
+   <div class="one">
+  <h1>Toutes les demandes reçues</h1>
+</div>
+
+    <!-- Flash messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- Table responsive -->
+    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">N°</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Prestations demandées</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Adresse</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for demande in demandes %}
+                <tr>
+                    <td>{{ demande.id }}</td>
+                    <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
+                    <td>
+                        {% for prestation in demande.prestations %}
+                            {{ prestation.titre }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ demande.naturedemandeur }}</td>
+                    <td>{{ demande.adresseprestation }}</td>
+                    <td>{{ demande.datedemande ? demande.datedemande|date('d/m/Y') : '' }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if demande.statut == 'En attente' %}bg-warning text-dark
+                            {% elseif demande.statut == 'Accepté' %}bg-success
+                            {% elseif demande.statut == 'Refusé' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ demande.statut }}
+                        </span>
+                    </td>
+                        <td class="d-flex gap-2">
+                            {% if demande.statut == 'en attente' or demande.statut == 'en cours' %}
+                                <a href="{{ path('admin_demande_accepter', {'id': demande.id}) }}" class="btn btn-primary btn-sm rounded-pill shadow-sm">Accepter</a>
+                                <a href="{{ path('admin_demande_refuser', {'id': demande.id}) }}" class="btn btn-danger btn-sm rounded-pill shadow-sm">Refuser</a>
+                                <a href="{{ path('admin_demande_annuler', {'id': demande.id}) }}" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Annuler</a>
+                            {% endif %}
+                        </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    body {
+        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    /* === BASE HEADING === */ 
+
+    h1 {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    font-family: "Raleway", sans-serif;
+    font-weight: 300;
+    font-size: 40px;
+    color: #080808;
+    -webkit-transition: all 0.4s ease 0s;
+    -o-transition: all 0.4s ease 0s;
+    transition: all 0.4s ease 0s;
+    }
+
+    h1 span {
+    display: block;
+    font-size: 0.5em;
+    line-height: 1.3;
+    }
+    h1 em {
+    font-style: normal;
+    font-weight: 600;
+    }
+
+    /* === HEADING STYLE #1 === */
+    .one h1 {
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 5px;
+    }
+    .one h1:before {
+    width: 28px;
+    height: 5px;
+    display: block;
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    margin-left: -14px;
+    background-color: #1226dfff;
+    }
+    .one h1:after {
+    width: 100px;
+    height: 1px;
+    display: block;
+    content: "";
+    position: relative;
+    margin-top: 25px;
+    left: 50%;
+    margin-left: -50px;
+    background-color: #1756dfff;
+    }
+    /* Ombres douces */
+    .shadow-sm {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Coins arrondis pour la table */
+    .table-responsive.rounded-4 {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

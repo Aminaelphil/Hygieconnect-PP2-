@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 class DemandeController extends AbstractController
 {
@@ -394,33 +396,151 @@ public function confirmer(SessionInterface $session, EntityManagerInterface $em)
             ]);
         }
 
-        #[Route('/demande/annuler/{id}', name: 'app_demande_annuler', methods: ['POST', 'GET'])]
-            public function annuler(int $id,EntityManagerInterface $em): Response {
-                $user = $this->getUser();
+#[Route('/demande/annuler/{id}', name: 'app_demande_annuler', methods: ['POST', 'GET'])]
+public function annuler(
+    int $id,
+    EntityManagerInterface $em,
+    MailerInterface $mailer
+): Response {
+    $user = $this->getUser();
 
-                if (!$user) {
-                    $this->addFlash('warning', 'Vous devez être connecté pour effectuer cette action.');
-                    return $this->redirectToRoute('app_login');
-                }
+    if (!$user) {
+        $this->addFlash('warning', 'Vous devez être connecté pour effectuer cette action.');
+        return $this->redirectToRoute('app_login');
+    }
 
-                $demande = $em->getRepository(Demande::class)->find($id);
+    $demande = $em->getRepository(Demande::class)->find($id);
 
-                if (!$demande) {
-                    $this->addFlash('danger', 'Demande introuvable.');
-                    return $this->redirectToRoute('app_mes_demandes');
-                }
+    if (!$demande) {
+        $this->addFlash('danger', 'Demande introuvable.');
+        return $this->redirectToRoute('app_mes_demandes');
+    }
 
-                if ($demande->getUser() !== $user) {
-                    $this->addFlash('danger', 'Vous ne pouvez pas annuler cette demande.');
-                    return $this->redirectToRoute('app_mes_demandes');
-                }
+    if ($demande->getUser() !== $user) {
+        $this->addFlash('danger', 'Vous ne pouvez pas annuler cette demande.');
+        return $this->redirectToRoute('app_mes_demandes');
+    }
 
-                $demande->setStatut(Demande::STATUT_ANNULEE);
-                $em->flush();
+    //  Mise à jour du statut
+    $demande->setStatut(Demande::STATUT_ANNULEE);
+    $em->flush();
 
-                $this->addFlash('success', 'Votre demande a bien été annulée.');
-                return $this->redirectToRoute('app_mes_demandes');
-            }
+    //  Envoi d’un email de notification
+    $email = (new TemplatedEmail())
+        ->from(new Address('no-reply@hygieconnect.com', 'HygieConnect'))
+        ->to($user->getEmail())
+        ->subject('Votre demande a été annulée')
+        ->htmlTemplate('emails/demande_annulee.html.twig')
+        ->context([
+            'user' => $user,
+            'demande' => $demande,
+        ]);
 
+    $mailer->send($email);
 
+    //  Message flash
+    $this->addFlash('success', 'Votre demande a bien été annulée et un email de confirmation vous a été envoyé.');
+
+    return $this->redirectToRoute('app_mes_demandes');
+}
+
+            // Côté ADMIN
+        #[Route('/admin/demandes', name: 'app_admin_demandes')]
+        public function adminDemandes(EntityManagerInterface $em): Response
+        {
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+            $demandes = $em->getRepository(Demande::class)->findBy(
+                [],
+                ['datedemande' => 'DESC']
+            );
+
+            return $this->render('demande/admin_demandes.html.twig', [
+                'demandes' => $demandes,
+            ]);
+        }
+
+// --- Accepter ---
+#[Route('/admin/demande/{id}/accepter', name: 'admin_demande_accepter')]
+public function accepterDemande(Demande $demande, EntityManagerInterface $em, MailerInterface $mailer): RedirectResponse
+{
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+    $demande->setStatut(Demande::STATUT_ACCEPTEE);
+    $em->flush();
+
+    if ($demande->getUser() && $demande->getUser()->getEmail()) {
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@hygieconnect.com', 'HygieConnect'))
+            ->to($demande->getUser()->getEmail())
+            ->subject('Votre demande a été acceptée')
+            ->htmlTemplate('emails/demande_statut.html.twig')
+            ->context([
+                'nom' => $demande->getUser()->getNom(),
+                'id' => $demande->getId(),
+                'statut' => 'Acceptée',
+            ]);
+
+        $mailer->send($email);
+    }
+
+    $this->addFlash('success', 'Demande acceptée et notification envoyée.');
+    return $this->redirectToRoute('app_admin_demandes');
+}
+
+// --- Refuser ---
+#[Route('/admin/demande/{id}/refuser', name: 'admin_demande_refuser')]
+public function refuserDemande(Demande $demande, EntityManagerInterface $em, MailerInterface $mailer): RedirectResponse
+{
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+    $demande->setStatut(Demande::STATUT_REFUSEE);
+    $em->flush();
+
+    if ($demande->getUser() && $demande->getUser()->getEmail()) {
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@hygieconnect.com', 'HygieConnect'))
+            ->to($demande->getUser()->getEmail())
+            ->subject('Votre demande a été refusée')
+            ->htmlTemplate('emails/demande_statut.html.twig')
+            ->context([
+                'nom' => $demande->getUser()->getNom(),
+                'id' => $demande->getId(),
+                'statut' => 'Refusée',
+            ]);
+
+        $mailer->send($email);
+    }
+
+    $this->addFlash('danger', 'Demande refusée et notification envoyée.');
+    return $this->redirectToRoute('app_admin_demandes');
+}
+
+// --- Annuler ---
+#[Route('/admin/demande/{id}/annuler', name: 'admin_demande_annuler')]
+public function annulerDemande(Demande $demande, EntityManagerInterface $em, MailerInterface $mailer): RedirectResponse
+{
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+    $demande->setStatut(Demande::STATUT_ANNULEE);
+    $em->flush();
+
+    if ($demande->getUser() && $demande->getUser()->getEmail()) {
+        $email = (new TemplatedEmail())
+            ->from(new Address('no-reply@hygieconnect.com', 'HygieConnect'))
+            ->to($demande->getUser()->getEmail())
+            ->subject('Votre demande a été annulée')
+            ->htmlTemplate('emails/demande_statut.html.twig')
+            ->context([
+                'nom' => $demande->getUser()->getNom(),
+                'id' => $demande->getId(),
+                'statut' => 'Annulée',
+            ]);
+
+        $mailer->send($email);
+    }
+
+    $this->addFlash('warning', 'Demande annulée et notification envoyée.');
+    return $this->redirectToRoute('app_admin_demandes');
+}
 }

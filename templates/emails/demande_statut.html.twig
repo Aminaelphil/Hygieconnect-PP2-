@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Statut de votre demande HygieConnect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #266fc2;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .status {
+            font-weight: bold;
+            color: {% if statut == 'Acceptée' %}#28a745
+                   {% elseif statut == 'Refusée' %}#dc3545
+                   {% elseif statut == 'Annulée' %}#6c757d
+                   {% else %}#0d6efd{% endif %};
+        }
+        .footer {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bonjour monsieur/madame {{ nom }} 👋</h2>
+
+        <p>Nous vous informons que le statut de votre demande <strong>n°{{ id }}</strong> a été mis à jour.</p>
+
+        <p>Nouvel état de votre demande : <span class="status">{{ statut }}</span></p>
+
+        {% if statut == 'Acceptée' %}
+            <p>Votre demande a été validée avec succès. Vous serez bientôt contacté(e) pour la suite.</p>
+        {% elseif statut == 'Refusée' %}
+            <p>Malheureusement, votre demande n’a pas pu être acceptée. Vous pouvez nous recontacter pour toute précision.</p>
+        {% elseif statut == 'Annulée' %}
+            <p>Votre demande a été annulée. Si vous souhaitez en créer une nouvelle, vous pouvez le faire depuis votre espace client.</p>
+        {% endif %}
+
+        <p>Merci d’avoir choisi <strong>notre expert du terrain monsieur Elphil !</strong></p>
+
+        <div class="footer">
+            HygieConnect – Votre service, simplement.
+        </div>
+    </div>
+</body>
+</html>

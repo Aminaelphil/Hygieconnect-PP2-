@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Demande annulée - HygieConnect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f9fc;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #266fc2;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .footer {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bonjour monsieur/madame {{ user.prenom }} {{ user.nom }},</h2>
+        <p>Votre demande de service <strong>N°{{ demande.id }}</strong> a bien été <strong>annulée</strong>.</p>
+
+        <p>Si cette annulation est une erreur, vous pouvez toujours en créer une nouvelle depuis votre espace personnel.</p>
+
+        <p>Merci d’avoir utilisé <strong>HygieConnect</strong> !</p>
+
+        <div class="footer">
+            HygieConnect – Votre service, simplement.
+        </div>
+    </div>
+</body>
+</html>
