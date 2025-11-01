@@ -1,143 +1,283 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Toutes les demandes{% endblock %}
+{% block title %}Demandes reçues - Tableau de bord{% endblock %}
 
-{% block body %}
-<div class="container py-5" style=" min-height:100vh;">
-   <div class="one">
-  <h1>Toutes les demandes reçues</h1>
-</div>
-
-    <!-- Flash messages -->
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} alert-dismissible fade show shadow-sm rounded-3" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endfor %}
-
-    <!-- Table responsive -->
-    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th scope="col">N°</th>
-                    <th scope="col">Client</th>
-                    <th scope="col">Prestations demandées</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Adresse</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Statut</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for demande in demandes %}
-                <tr>
-                    <td>{{ demande.id }}</td>
-                    <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
-                    <td>
-                        {% for prestation in demande.prestations %}
-                            {{ prestation.titre }}{% if not loop.last %}, {% endif %}
-                        {% endfor %}
-                    </td>
-                    <td>{{ demande.naturedemandeur }}</td>
-                    <td>{{ demande.adresseprestation }}</td>
-                    <td>{{ demande.datedemande ? demande.datedemande|date('d/m/Y') : '' }}</td>
-                    <td>
-                        <span class="badge 
-                            {% if demande.statut == 'En attente' %}bg-warning text-dark
-                            {% elseif demande.statut == 'Accepté' %}bg-success
-                            {% elseif demande.statut == 'Refusé' %}bg-danger
-                            {% else %}bg-secondary{% endif %}">
-                            {{ demande.statut }}
-                        </span>
-                    </td>
-                        <td class="d-flex gap-2">
-                            {% if demande.statut == 'en attente' or demande.statut == 'en cours' %}
-                                <a href="{{ path('admin_demande_accepter', {'id': demande.id}) }}" class="btn btn-primary btn-sm rounded-pill shadow-sm">Accepter</a>
-                                <a href="{{ path('admin_demande_refuser', {'id': demande.id}) }}" class="btn btn-danger btn-sm rounded-pill shadow-sm">Refuser</a>
-                                <a href="{{ path('admin_demande_annuler', {'id': demande.id}) }}" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Annuler</a>
-                            {% endif %}
-                        </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/admindemande.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     body {
-        background-image: url('{{ asset('images/back7.jpg') }}');
+        background-image: url('{{ asset('images/background4.jpg') }}');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
         background-attachment: fixed;
     }
-    /* === BASE HEADING === */ 
-
-    h1 {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    font-family: "Raleway", sans-serif;
-    font-weight: 300;
-    font-size: 40px;
-    color: #080808;
-    -webkit-transition: all 0.4s ease 0s;
-    -o-transition: all 0.4s ease 0s;
-    transition: all 0.4s ease 0s;
-    }
-
-    h1 span {
-    display: block;
-    font-size: 0.5em;
-    line-height: 1.3;
-    }
-    h1 em {
-    font-style: normal;
-    font-weight: 600;
-    }
-
-    /* === HEADING STYLE #1 === */
-    .one h1 {
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.last-update {
+    display: inline-block;
+    font-size: 2rem;   /* un peu plus grand que small par défaut */
+    font-weight: 600;     /* semi-bold */
+    color: #000000ff;       /* couleur bleu Bootstrap pour ressortir */
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(13, 110, 253, 0.1); /* léger fond bleu */
+    border-radius: 0.3rem;
+}
+/* === CARDS STATISTIQUES === */
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.stats-card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     text-align: center;
-    text-transform: uppercase;
-    padding-bottom: 5px;
-    }
-    .one h1:before {
-    width: 28px;
-    height: 5px;
-    display: block;
-    content: "";
-    position: absolute;
-    bottom: 3px;
-    left: 50%;
-    margin-left: -14px;
-    background-color: #1226dfff;
-    }
-    .one h1:after {
-    width: 100px;
-    height: 1px;
-    display: block;
-    content: "";
-    position: relative;
-    margin-top: 25px;
-    left: 50%;
-    margin-left: -50px;
-    background-color: #1756dfff;
-    }
-    /* Ombres douces */
-    .shadow-sm {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-    }
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.stats-card h2 {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 700;
+}
+.stats-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+}
 
-    /* Coins arrondis pour la table */
-    .table-responsive.rounded-4 {
-        overflow: hidden;
-    }
+/* === TABLE === */
+.table tbody tr {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.btn-success-soft { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
+.btn-danger-soft { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
+.btn-secondary-soft { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; }
+
+/* === CHART === */
+.chart-container {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
 </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container py-5">
+
+    <!-- HEADER -->
+    <div class="page-header text-center mb-5">
+    <div class="one">
+  <h1>Gérez toutes les demandes de services reçues en un coup d'œil</h1>
+    </div>
+      
+     <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}</small>
+
+    </div>
+
+ <!-- STATISTIQUES -->
+<div class="stats-cards">
+    <div class="stats-card">
+        <h2>{{ stats.total }}</h2>
+        <p>Total des demandes</p>
+    </div>
+    <div class="stats-card">
+        <h2>{{ stats.acceptees }}</h2>
+        <p>Demandes acceptées</p>
+    </div>
+    <div class="stats-card">
+        <h2>{{ stats.refusees }}</h2>
+        <p>Demandes refusées</p>
+    </div>
+    <div class="stats-card">
+        <h2>{{ stats.enCours }}</h2>
+        <p>Demandes en cours</p>
+    </div>
+    <div class="stats-card">
+        <h2>{{ stats.tauxAccept }}%</h2>
+        <p>Taux d'acceptation</p>
+    </div>
+    <div class="stats-card">
+        <h2>{{ stats.tauxAnnule }}%</h2>
+        <p>Taux d'annulation</p>
+    </div>
+</div>
+
+<!-- GRAPHIQUES CÔTE À CÔTE -->
+<div class="charts-flex" style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
+    <div class="chart-container" style="flex: 1 1 400px;">
+        <canvas id="statusChart"></canvas>
+    </div>
+    <div class="chart-container" style="flex: 1 1 400px;">
+        <canvas id="usersChart"></canvas>
+    </div>
+</div>
+
+<script>
+const ctx = document.getElementById('statusChart').getContext('2d');
+const statusChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['En Cours', 'Accepté', 'Refusé', 'Annulée'],
+        datasets: [{
+            data: [{{ stats.enCours }}, {{ stats.acceptees }}, {{ stats.refusees }}, {{ stats.annulees }}],
+            backgroundColor: ['rgba(21, 208, 255, 1)','rgba(10, 125, 202, 1)','rgba(122, 15, 15, 1)','rgba(228, 72, 72, 1)'],
+            borderColor: ['rgba(15,12,1,1)','rgba(25,135,84,1)','rgba(22,10,12,1)','rgba(108,117,125,1)'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Répartition des demandes par statut', font: { size: 16 } }
+        }
+    }
+});
+
+const ctxUsers = document.getElementById('usersChart').getContext('2d');
+const usersChart = new Chart(ctxUsers, {
+    type: 'doughnut',
+    data: {
+        labels: ['Utilisateurs inscrits', 'Utilisateurs ayant fait une demande'],
+        datasets: [{
+            data: [{{ stats.totalUsers - stats.usersWithDemandes }}, {{ stats.usersWithDemandes }}],
+            backgroundColor: ['rgba(108, 117, 125, 0.6)', 'rgba(25, 135, 84, 0.6)'],
+            borderColor: ['rgba(108, 117, 125, 1)', 'rgba(25, 135, 84, 1)'],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Statistiques utilisateurs' }
+        }
+    }
+});
+</script>
+
+
+<!-- PRESTATIONS PAR CATEGORIE -->
+<div class="chart-container" style="max-width: 600px; margin: 0 auto 2rem;">
+    <canvas id="prestationsChart"></canvas>
+</div>
+
+<script>
+const ctxPrestations = document.getElementById('prestationsChart').getContext('2d');
+const prestationsChart = new Chart(ctxPrestations, {
+    type: 'bar',
+    data: {
+        labels: [{% for cat, nb in stats.prestationsByCategorie %}'{{ cat }}',{% endfor %}],
+        datasets: [{
+            label: 'Nombre de prestations',
+            data: [{% for cat, nb in stats.prestationsByCategorie %}{{ nb }},{% endfor %}],
+            backgroundColor: 'rgba(15, 120, 206, 1)',
+            borderColor: 'rgba(0, 60, 255, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Prestations par catégorie', font: { size: 16 } }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
+
+    <!-- TABLEAU DES DEMANDES -->
+    <div class="card border-0 rounded-4 shadow-lg bg-white bg-opacity-75 backdrop-blur p-2">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light text-uppercase small text-secondary">
+                    <tr>
+                        <th>N°</th>
+                        <th>Client</th>
+                        <th>Prestations</th>
+                        <th>Type</th>
+                        <th>Adresse</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for demande in demandes %}
+                    <tr class="hover-row">
+                        <td>{{ demande.id }}</td>
+                        <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
+                        <td>
+                            {% for prestation in demande.prestations %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">{{ prestation.titre }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ demande.naturedemandeur }}</td>
+                        <td>{{ demande.adresseprestation }}</td>
+                        <td>{{ demande.datedemande ? demande.datedemande|date('d/m/Y') : '' }}</td>
+                        <td>
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold 
+                                {% if demande.statut == 'en attente' %} bg-warning-subtle text-warning border border-warning
+                                {% elseif demande.statut == 'acceptée' %} bg-success-subtle text-success border border-success
+                                {% elseif demande.statut == 'refusée' %} bg-danger-subtle text-danger border border-danger
+                                {% else %} bg-secondary-subtle text-secondary border border-secondary
+                                {% endif %}">{{ demande.statut }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if demande.statut in ['en attente', 'en cours'] %}
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('admin_demande_accepter', {'id': demande.id}) }}" class="btn btn-sm btn-success rounded-pill">
+                                        <i class="bi bi-check-circle"></i>
+                                    </a>
+                                    <a href="{{ path('admin_demande_refuser', {'id': demande.id}) }}" class="btn btn-sm btn-danger rounded-pill">
+                                        <i class="bi bi-x-circle"></i>
+                                    </a>
+                                    <a href="{{ path('admin_demande_annuler', {'id': demande.id}) }}" class="btn btn-sm btn-secondary rounded-pill">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Aucune demande reçue pour le moment.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
