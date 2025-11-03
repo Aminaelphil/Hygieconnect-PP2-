@@ -13,6 +13,8 @@
         "doctrine/orm": "^3.5",
         "dompdf/dompdf": "^3.1",
         "easycorp/easyadmin-bundle": "^4.26",
+        "nyholm/psr7": "^1.8",
+        "openai-php/client": "^0.18.0",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.3",
         "symfony/asset": "7.3.*",

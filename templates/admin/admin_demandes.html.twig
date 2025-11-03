@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     body {
-        background-image: url('{{ asset('images/background4.jpg') }}');
+        background-image: url('{{ asset('images/background.jpg') }}');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -97,6 +97,14 @@
      <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}</small>
 
     </div>
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ path('admin_prestation_new') }}" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-lg"></i> Ajouter une prestation
+    </a>
+    <a href="{{ path('admin_prestation_list') }}" class="btn btn-success shadow-sm">
+        &larr; Consulter la liste des prestations
+    </a>
+</div>
 
  <!-- STATISTIQUES -->
 <div class="stats-cards">

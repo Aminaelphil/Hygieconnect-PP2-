@@ -482,7 +482,7 @@ public function adminDemandes(EntityManagerInterface $em): Response
         $prestationsByCategorie[$categorie]++;
     }
 
-    return $this->render('demande/admin_demandes.html.twig', [
+    return $this->render('admin/admin_demandes.html.twig', [
         'demandes' => $demandes,
         'stats' => [
             'total' => $total,

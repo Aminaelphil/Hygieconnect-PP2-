@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une prestation{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <h1 class="card-title mb-4 text-center text-primary fw-bold">Ajouter une prestation</h1>
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                    {% for field in form %}
+                        <div class="mb-3">
+                            {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            <div class="input-group">
+                                {{ form_widget(field, {'attr': {'class': 'form-control shadow-sm'}}) }}
+                                {# Optionnel : icône à la fin du champ #}
+                                {# <span class="input-group-text"><i class="bi bi-pencil-fill"></i></span> #}
+                            </div>
+                            {{ form_errors(field) }}
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-grid my-3">
+                        <button class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-plus-lg me-2"></i> Ajouter
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{{ path('admin_prestation_list') }}" class="btn btn-secondary shadow-sm">
+                            &larr; Retour à la liste
+                        </a>
+        
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-image: url('{{ asset('images/background.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        font-family: "Segoe UI", Roboto, sans-serif;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+    }
+
+    .btn-primary {
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #e2e6ea;
+    }
+
+    .input-group-text {
+        background-color: #f4f7fc;
+        border-left: 0;
+    }
+</style>
+
+<script>
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })()
+</script>
+{% endblock %}

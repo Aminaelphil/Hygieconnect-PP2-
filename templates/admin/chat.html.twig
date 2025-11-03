@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Assistant IA – HygieConnect</h2>
+
+    <form method="POST" class="d-flex mb-3">
+        <input type="text" name="question" class="form-control me-2" placeholder="Posez une question sur une entreprise..." required>
+        <button class="btn btn-primary">Envoyer</button>
+    </form>
+
+    {% if answer %}
+        <div class="card shadow-sm p-3 bg-light">
+            <h5>Réponse :</h5>
+            <p>{{ answer|nl2br }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
