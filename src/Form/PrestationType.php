@@ -21,7 +21,7 @@ class PrestationType extends AbstractType
             ->add('duree')
             ->add('categorie', EntityType::class, [
                 'class' => Categorie::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
         ;
     }

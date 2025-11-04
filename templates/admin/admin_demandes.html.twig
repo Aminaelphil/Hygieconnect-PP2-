@@ -13,7 +13,13 @@
         background-position: center;
         background-attachment: fixed;
     }
+    
 .dashboard-container {
+    max-width: 2000px;
+    margin: 0 auto;
+}
+
+.dashboard1-container {
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -86,25 +92,27 @@
 {% endblock %}
 
 {% block body %}
-<div class="dashboard-container py-5">
+<div class="dashboard1-container py-5">
 
-    <!-- HEADER -->
-    <div class="page-header text-center mb-5">
-    <div class="one">
-  <h1>Gérez toutes les demandes de services reçues en un coup d'œil</h1>
-    </div>
-      
-     <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}</small>
+<!-- HEADER -->
+<div class="page-header text-center mb-5"> <div class="one">
+ <h1>Tableau de bord</h1>
+  </div> <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}
+  </small>
+</div>
 
-    </div>
-<div class="d-flex flex-wrap gap-2 mb-4">
-    <a href="{{ path('admin_prestation_new') }}" class="btn btn-primary shadow-sm">
-        <i class="bi bi-plus-lg"></i> Ajouter une prestation
+<!-- BOUTONS CENTRÉS -->
+<div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+    <a href="{{ path('admin_prestation_new') }}" class="btn btn-primary d-flex align-items-center gap-2">
+        <i class="bi bi-layers"></i>
+        <span>Ajouter une prestation</span>
     </a>
-    <a href="{{ path('admin_prestation_list') }}" class="btn btn-success shadow-sm">
-        &larr; Consulter la liste des prestations
+    <a href="{{ path('admin_prestation_list') }}" class="btn btn-success d-flex align-items-center gap-2">
+        <i class="bi bi-list-check"></i>
+        <span>Consulter la liste des prestations</span>
     </a>
 </div>
+
 
  <!-- STATISTIQUES -->
 <div class="stats-cards">
@@ -153,7 +161,7 @@ const statusChart = new Chart(ctx, {
         datasets: [{
             data: [{{ stats.enCours }}, {{ stats.acceptees }}, {{ stats.refusees }}, {{ stats.annulees }}],
             backgroundColor: ['rgba(21, 208, 255, 1)','rgba(10, 125, 202, 1)','rgba(122, 15, 15, 1)','rgba(228, 72, 72, 1)'],
-            borderColor: ['rgba(15,12,1,1)','rgba(25,135,84,1)','rgba(22,10,12,1)','rgba(108,117,125,1)'],
+            borderColor: ['rgba(34, 67, 255, 0.42)','rgba(25,135,84,1)','rgba(22,10,12,1)','rgba(108,117,125,1)'],
             borderWidth: 1
         }]
     },
@@ -224,7 +232,73 @@ const prestationsChart = new Chart(ctxPrestations, {
     }
 });
 </script>
+</div>
 
+<form method="get" action="{{ path('app_admin_demandes') }}" 
+      class="search-form bg-white shadow-sm rounded-4 p-3 p-md-4 mb-4 border animate-fade-in">
+
+    <div class="row g-3 align-items-center">
+        <!-- Champ de recherche -->
+        <div class="col-md-4">
+            <div class="input-group input-hover">
+                <span class="input-group-text bg-light border-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    class="form-control border-0 shadow-none" 
+                    placeholder="Rechercher par nom ou prénom..." 
+                    value="{{ search }}">
+            </div>
+        </div>
+
+        <!-- Type de demandeur -->
+        <div class="col-md-3">
+            <div class="input-group input-hover">
+                <span class="input-group-text bg-light border-0">
+                    <i class="bi bi-person-badge"></i>
+                </span>
+                <select name="naturedemandeur" class="form-select border-0 shadow-none">
+                    <option value="">Type de demandeur</option>
+                    {% for type in ['particulier', 'hotel', 'centre de formation', 'hopital/clinique'] %}
+                        <option value="{{ type }}" {% if nature == type %}selected{% endif %}>
+                            {{ type|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Statut -->
+        <div class="col-md-3">
+            <div class="input-group input-hover">
+                <span class="input-group-text bg-light border-0">
+                    <i class="bi bi-flag"></i>
+                </span>
+                <select name="statut" class="form-select border-0 shadow-none">
+                    <option value="">Statut</option>
+                    {% for s in ['en attente', 'en cours', 'acceptée', 'refusée', 'annulée'] %}
+                        <option value="{{ s }}" {% if statut == s %}selected{% endif %}>
+                            {{ s|capitalize }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Bouton -->
+        <div class="col-md-2 text-end">
+            <button type="submit" 
+                    class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm btn-hover">
+                <i class="bi bi-funnel"></i>
+                <span>Filtrer</span>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="dashboard-container py-5">
     <!-- TABLEAU DES DEMANDES -->
     <div class="card border-0 rounded-4 shadow-lg bg-white bg-opacity-75 backdrop-blur p-2">
         <div class="table-responsive">
@@ -236,7 +310,9 @@ const prestationsChart = new Chart(ctxPrestations, {
                         <th>Prestations</th>
                         <th>Type</th>
                         <th>Adresse</th>
-                        <th>Date</th>
+                        <th>Date de demande</th>
+                        <th>Du</th>
+                        <th>Au</th>
                         <th>Statut</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -248,19 +324,25 @@ const prestationsChart = new Chart(ctxPrestations, {
                         <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
                         <td>
                             {% for prestation in demande.prestations %}
-                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">{{ prestation.titre }}</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">
+                                    {{ prestation.titre }}
+                                </span>
                             {% endfor %}
                         </td>
                         <td>{{ demande.naturedemandeur }}</td>
                         <td>{{ demande.adresseprestation }}</td>
                         <td>{{ demande.datedemande ? demande.datedemande|date('d/m/Y') : '' }}</td>
+                        <td>{{ demande.datedebut ? demande.datedebut|date('d/m/Y') : '-' }}</td>
+                        <td>{{ demande.datefin ? demande.datefin|date('d/m/Y') : '-' }}</td>
                         <td>
                             <span class="badge rounded-pill px-3 py-2 fw-semibold 
                                 {% if demande.statut == 'en attente' %} bg-warning-subtle text-warning border border-warning
                                 {% elseif demande.statut == 'acceptée' %} bg-success-subtle text-success border border-success
                                 {% elseif demande.statut == 'refusée' %} bg-danger-subtle text-danger border border-danger
                                 {% else %} bg-secondary-subtle text-secondary border border-secondary
-                                {% endif %}">{{ demande.statut }}</span>
+                                {% endif %}">
+                                {{ demande.statut }}
+                            </span>
                         </td>
                         <td class="text-center">
                             {% if demande.statut in ['en attente', 'en cours'] %}
@@ -280,7 +362,7 @@ const prestationsChart = new Chart(ctxPrestations, {
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-4">Aucune demande reçue pour le moment.</td>
+                        <td colspan="10" class="text-center text-muted py-4">Aucune demande reçue pour le moment.</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -288,4 +370,5 @@ const prestationsChart = new Chart(ctxPrestations, {
         </div>
     </div>
 </div>
+
 {% endblock %}
