@@ -4,9 +4,9 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/styleformation.css') }}">
 {% endblock %}
+
 {% block body %}
-    <style>
-/* === HERO SECTION === */
+<style>
 .hero {
   background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.35)), 
               url('{{ asset('images/back2.jpg') }}') center/cover fixed;
@@ -18,10 +18,10 @@
 }
 </style>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <section class="hero">
   <h1>Formations Professionnelles</h1>
-  <p>Développez vos compétences grâce à nos programmes conçus par notre expert du terrain.</p>
+  <p>Développez vos compétences grâce à nos programmes conçus par des experts du terrain.</p>
   <a href="{{ path('app_demande_new') }}" class="btn-gradient">Demander une formation</a>
 </section>
 
@@ -29,66 +29,48 @@
 <section class="container py-5">
   <h2 class="section-title">Qu’est-ce qu’une formation ?</h2>
   <div class="explanation">
-    Une formation est un <strong>processus d’apprentissage</strong> qui allie théorie et pratique.  
-    Elle vise à <strong>développer les compétences</strong>, à <strong>acquérir des connaissances</strong> 
-    et à <strong>maîtriser des notions théoriques essentielles</strong> pour mieux comprendre et 
-    appliquer les pratiques professionnelles sur le terrain.  
+    Une formation est un <strong>processus d’apprentissage</strong> alliant théorie et pratique.
+    Elle vise à <strong>développer les compétences</strong> et à <strong>acquérir les connaissances</strong>
+    nécessaires pour renforcer les pratiques professionnelles sur le terrain.
   </div>
 </section>
 
-<!-- FORMATIONS -->
+<!-- FORMATIONS DYNAMIQUES -->
 <section class="container pb-4">
   <div class="row g-4">
-    {% set formations = [
-      {'titre': 'Prévention et traitement des légionelles', 'description': 'Gestion de la qualité des eaux sanitaires.', 'jours': 3, 'prix': 480, 'image': 'formation1.jpg'},
-      {'titre': 'Gestion de la qualité des eaux de piscines', 'description': 'Formation sur la réglementation et la qualité de l’eau.', 'jours': 2, 'prix': 350, 'note': '3 j avec formation pratique sur site', 'image': 'formation2.jpg'},
-      {'titre': 'Auto diagnostic et audit interne', 'description': 'Apprenez à évaluer vos installations et procédures.', 'jours': 3, 'prix': 420, 'image': 'formation3.jpg'},
-      {'titre': 'Maintenance préventive par secteur spécifique', 'description': 'Cuisines, restaurants, locaux techniques.', 'jours': 2, 'prix': 390, 'image': 'formation4.jpg'},
-      {'titre': 'Hygiène des chambres (hébergement)', 'description': 'Renforcez la propreté et la sécurité sanitaire.', 'jours': 1, 'prix': 280, 'note': '1/2 journée par groupe', 'image': 'formation5.jpg'},
-      {'titre': 'Bonnes pratiques d\'hygiène dans les centres SPA / Thalassothérapie', 'description': 'Optimisez vos protocoles sanitaires dans les centres de bien-être.', 'jours': 2, 'prix': 350, 'image': 'formation6.jpg'},
-      {'titre': 'Hygiène de base (BPH) dans la restauration collective', 'description': 'Formation complète en 6 modules.', 'jours': 3, 'prix': 550, 'modules': [
-        'Hygiène du personnel et du comportement',
-        'Hygiène des surfaces et des équipements',
-        'Contrôle et gestion des matières premières',
-        'Organisation du travail et hygiène des préparations',
-        'Hygiène des buffets et maîtrise des points critiques',
-        'Prévention des TIAC – Méthode HACCP et 5 M'
-      ], 'image': 'back1.jpg'}
-    ] %}
+    {% if formations is empty %}
+      <p class="text-center text-muted">Aucune formation disponible pour le moment.</p>
+    {% else %}
+      {% for formation in formations %}
+        {# Option : Si une formation a un titre spécifique, on peut la rendre plus large #}
+        {% set isWide = formation.titre matches '/Hygiène de base/' %}
 
-    {% for formation in formations %}
-      {% set isWide = formation.titre == 'Hygiène de base (BPH) dans la restauration collective' %}
-      <div class="col-md-6 {{ isWide ? 'col-lg-12' : 'col-lg-4' }} animate-card">
-        <div class="card modern-card h-100 {{ isWide ? 'card-wide' : '' }}">
-          <div class="position-relative">
-            <img src="{{ asset('images/' ~ formation.image) }}" class="card-img-top" alt="{{ formation.titre }}">
-            <div class="badge-container">
-              <span class="badge badge-gradient">{{ formation.jours }} jour{{ formation.jours > 1 ? 's' : '' }}</span>
-              <span class="badge badge-price">{{ formation.prix }} DT</span>
+        <div class="col-md-6 {{ isWide ? 'col-lg-12' : 'col-lg-4' }} animate-card">
+          <div class="card modern-card h-100 {{ isWide ? 'card-wide' : '' }}">
+            <div class="position-relative">
+              <img src="{{ asset('images/' ~ (formation.image ?? 'formation1.jpg')) }}" 
+                   class="card-img-top" alt="{{ formation.titre }}">
+              <div class="badge-container">
+                <span class="badge badge-gradient">{{ formation.duree ?? 'Durée non précisée' }}</span>
+                <span class="badge badge-price">{{ formation.prix }} DT</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title mt-3">{{ formation.titre }}</h5>
+              <p class="card-description mt-2">{{ formation.description }}</p>
             </div>
           </div>
-          <div class="card-body">
-            <h5 class="card-title mt-3">{{ formation.titre }}</h5>
-            {% if formation.modules is defined %}
-              <ul class="modules-list">
-                {% for module in formation.modules %}
-                  <li>• {{ module }}</li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p class="mt-2">{{ formation.description }}</p>
-            {% endif %}
-          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
   </div>
 </section>
 
 <!-- FOOTER CTA -->
 <section class="footer-cta">
   <h3>Besoin d'une formation sur mesure ?</h3>
-  <p>Notre expert conçoit des programmes adaptés à vos besoins et à votre environnement de travail.</p>
+  <p>Nos experts conçoivent des programmes adaptés à vos besoins et à votre environnement de travail.</p>
   <a href="{{ path('app_demande_new') }}" class="btn">Contactez-nous</a>
 </section>
 

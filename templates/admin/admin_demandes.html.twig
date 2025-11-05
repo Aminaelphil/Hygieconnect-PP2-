@@ -5,304 +5,358 @@
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset('css/admindemande.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-    body {
-        background-image: url('{{ asset('images/background.jpg') }}');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-attachment: fixed;
-    }
-    
-.dashboard-container {
-    max-width: 2000px;
-    margin: 0 auto;
+/* ---------- Page & Wave Background ---------- */
+:root{
+  --primary: #0d6efd;
+  --primary-600: #0f76fd;
+  --glass: rgba(255,255,255,0.8);
 }
 
-.dashboard1-container {
+body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, #f4fbff 0%, #ffffff 40%);
+    color: #222;
+    min-height: 100vh;
+    -webkit-font-smoothing:antialiased;
+}
+
+/* wave layers (absolute, behind everything) */
+.wave-layer {
+    position: fixed;
+    left: 50%;
+    top: -10%;
+    width: 180%;
+    height: 120%;
+    transform-origin: center;
+    z-index: -2;
+    border-radius: 43% 57% 59% 41% / 36% 42% 58% 64%;
+    pointer-events: none;
+    filter: blur(30px);
+    opacity: 0.35;
+    transition: transform 0.2s linear;
+}
+.wave-layer.wave1 {
+    background: linear-gradient(135deg, rgba(15,118,253,0.95) 20%, rgba(99,167,255,0.95) 80%);
+}
+.wave-layer.wave2 {
+    background: linear-gradient(135deg, rgba(5,94,209,0.9) 20%, rgba(15,118,253,0.9) 80%);
+    opacity: 0.25;
+    filter: blur(36px);
+    top: -20%;
+}
+
+/* ---------- Container ---------- */
+.container-main {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 48px 20px;
+}
+
+/* ---------- Header ---------- */
+.page-header {
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+.page-header .title {
+    display:flex;
+    align-items: center;
+    gap: 16px;
+}
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--primary-600);
+    letter-spacing: 0.2px;
 }
 .last-update {
     display: inline-block;
-    font-size: 2rem;   /* un peu plus grand que small par défaut */
-    font-weight: 600;     /* semi-bold */
-    color: #000000ff;       /* couleur bleu Bootstrap pour ressortir */
-    padding: 0.2rem 0.5rem;
-    background-color: rgba(13, 110, 253, 0.1); /* léger fond bleu */
-    border-radius: 0.3rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-600);
+    padding: 6px 10px;
+    background-color: rgba(13,110,253,0.08);
+    border-radius: 8px;
 }
-/* === CARDS STATISTIQUES === */
+
+/* chat open button aligned to header on small */
+.header-actions {
+    display:flex;
+    gap: 8px;
+    align-items:center;
+}
+
+/* ---------- Stat cards ---------- */
 .stats-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
 }
 .stats-card {
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(12px);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.stats-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-.stats-card h2 {
-    font-size: 2rem;
-    margin: 0;
-    font-weight: 700;
-}
-.stats-card p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #555;
-}
-
-/* === TABLE === */
-.table tbody tr {
-    background: #fff;
+    background: var(--glass);
+    backdrop-filter: blur(8px);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(10,20,40,0.06);
+    text-align: center;
+    transition: transform .18s ease, box-shadow .18s ease;
 }
-.table tbody tr:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-.btn-success-soft { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
-.btn-danger-soft { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; }
-.btn-secondary-soft { background-color: rgba(108, 117, 125, 0.1); color: #6c757d; }
+.stats-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(10,20,40,0.09); }
+.stats-card h2 { margin:0; font-size:1.6rem; color: var(--primary-600); font-weight:700; }
+.stats-card p { margin:6px 0 0; color:#4b5563; font-size:0.92rem; }
 
-/* === CHART === */
+/* ---------- Charts layout ---------- */
+.charts-row {
+    display:flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
 .chart-container {
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(12px);
-    border-radius: 1rem;
-    padding: 1.2rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    max-width: 500px;
-    margin: 0 auto 2rem;
+    flex: 1 1 380px;
+    min-width: 300px;
+    background: var(--glass);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(10,20,40,0.06);
+}
+
+/* ---------- Prestations chart block ---------- */
+.prestations-wrapper {
+    max-width: 720px;
+    margin: 0 auto 28px;
+}
+
+/* ---------- Search / filter form ---------- */
+.search-form {
+    margin-bottom: 22px;
+    border-radius: 12px;
+}
+.input-hover .input-group-text { background: transparent; border: 0; }
+.form-control:focus { box-shadow: 0 0 0 0.12rem rgba(15,118,253,0.12); border-color: var(--primary-600); }
+
+/* ---------- Table ---------- */
+.card-table {
+    background: rgba(255,255,255,0.9);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(10,20,40,0.06);
+}
+.table thead th { border-bottom: none; }
+.table tbody tr { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(10,20,40,0.03); transition: transform .12s ease; }
+.table tbody tr:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(10,20,40,0.06); }
+
+/* badges */
+.badge-custom {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight:600;
+    font-size:0.82rem;
+}
+
+/* ---------- Chat floating icon & panel ---------- */
+.chat-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg,var(--primary), #00bcd4);
+    color: #fff;
+    border-radius: 50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 26px;
+    box-shadow: 0 10px 30px rgba(13,110,253,0.18);
+    cursor: pointer;
+    z-index: 2000;
+    transition: transform .18s ease;
+}
+.chat-fab:hover { transform: scale(1.06); }
+
+/* panel */
+.chat-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 100px;
+    width: 360px;
+    max-width: calc(100% - 40px);
+    height: 520px;
+    display: none;
+    flex-direction: column;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(10,20,40,0.12);
+    z-index: 2000;
+    overflow: hidden;
+}
+.chat-panel.open { display: flex; animation: panelIn .22s ease; }
+@keyframes panelIn { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+.chat-panel .header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 14px;
+    background: linear-gradient(90deg,var(--primary-600), #3aa0ff);
+    color: #fff;
+}
+.chat-panel .header h5 { margin:0; font-size:1rem; font-weight:700; }
+.chat-panel .messages { flex:1; padding:14px; overflow-y:auto; background: linear-gradient(180deg,#fbfdff,#f3f8ff); }
+.chat-panel .composer { padding:12px; border-top:1px solid #e6eefc; display:flex; gap:8px; }
+.chat-panel .composer input { flex:1; border-radius: 999px; border:1px solid #dbe9ff; padding:10px 14px; outline:none; }
+.chat-panel .composer button { border-radius: 999px; padding:10px 14px; border: none; background: linear-gradient(90deg,var(--primary-600), #12b0ff); color:white; }
+
+/* message bubbles */
+.msg { margin-bottom:10px; max-width:85%; word-wrap:break-word; padding:10px 12px; border-radius:12px; font-size:0.95rem; line-height:1.35; display:inline-block; }
+.msg.user { background: linear-gradient(90deg,#e6f0ff,#dbeaff); color:var(--primary-600); align-self:flex-end; border-bottom-right-radius:4px; }
+.msg.ia { background:#fff; color:#263238; border:1px solid #eef6ff; border-bottom-left-radius:4px; }
+
+/* typing dots */
+.typing-dots { display:inline-block; width:36px; }
+.typing-dots span { display:inline-block; width:6px; height:6px; margin:0 3px; background:#9aaedc; border-radius:50%; animation:dot 1s infinite; }
+.typing-dots span:nth-child(2){ animation-delay: .15s }
+.typing-dots span:nth-child(3){ animation-delay: .3s }
+@keyframes dot { 0%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} 100%{ transform: translateY(0)} }
+
+/* responsive adjustments */
+@media (max-width: 900px) {
+    .chat-panel { right: 12px; left: 12px; bottom: 90px; width: auto; height: 60vh; }
+    .charts-row { flex-direction: column; }
+    .page-header { flex-direction: column; align-items:flex-start; gap:8px; }
 }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="dashboard1-container py-5">
+<!-- Wave background layers (move on scroll via JS) -->
+<div class="wave-layer wave1" id="wave1" aria-hidden="true"></div>
+<div class="wave-layer wave2" id="wave2" aria-hidden="true"></div>
 
-<!-- HEADER -->
-<div class="page-header text-center mb-5"> <div class="one">
- <h1>Tableau de bord</h1>
-  </div> <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}
-  </small>
-</div>
+<div class="container-main">
 
-<!-- BOUTONS CENTRÉS -->
-<div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-    <a href="{{ path('admin_prestation_new') }}" class="btn btn-primary d-flex align-items-center gap-2">
-        <i class="bi bi-layers"></i>
-        <span>Ajouter une prestation</span>
-    </a>
-    <a href="{{ path('admin_prestation_list') }}" class="btn btn-success d-flex align-items-center gap-2">
-        <i class="bi bi-list-check"></i>
-        <span>Consulter la liste des prestations</span>
-    </a>
-</div>
-
-
- <!-- STATISTIQUES -->
-<div class="stats-cards">
-    <div class="stats-card">
-        <h2>{{ stats.total }}</h2>
-        <p>Total des demandes</p>
-    </div>
-    <div class="stats-card">
-        <h2>{{ stats.acceptees }}</h2>
-        <p>Demandes acceptées</p>
-    </div>
-    <div class="stats-card">
-        <h2>{{ stats.refusees }}</h2>
-        <p>Demandes refusées</p>
-    </div>
-    <div class="stats-card">
-        <h2>{{ stats.enCours }}</h2>
-        <p>Demandes en cours</p>
-    </div>
-    <div class="stats-card">
-        <h2>{{ stats.tauxAccept }}%</h2>
-        <p>Taux d'acceptation</p>
-    </div>
-    <div class="stats-card">
-        <h2>{{ stats.tauxAnnule }}%</h2>
-        <p>Taux d'annulation</p>
-    </div>
-</div>
-
-<!-- GRAPHIQUES CÔTE À CÔTE -->
-<div class="charts-flex" style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
-    <div class="chart-container" style="flex: 1 1 400px;">
-        <canvas id="statusChart"></canvas>
-    </div>
-    <div class="chart-container" style="flex: 1 1 400px;">
-        <canvas id="usersChart"></canvas>
-    </div>
-</div>
-
-<script>
-const ctx = document.getElementById('statusChart').getContext('2d');
-const statusChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: ['En Cours', 'Accepté', 'Refusé', 'Annulée'],
-        datasets: [{
-            data: [{{ stats.enCours }}, {{ stats.acceptees }}, {{ stats.refusees }}, {{ stats.annulees }}],
-            backgroundColor: ['rgba(21, 208, 255, 1)','rgba(10, 125, 202, 1)','rgba(122, 15, 15, 1)','rgba(228, 72, 72, 1)'],
-            borderColor: ['rgba(34, 67, 255, 0.42)','rgba(25,135,84,1)','rgba(22,10,12,1)','rgba(108,117,125,1)'],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: 'Répartition des demandes par statut', font: { size: 16 } }
-        }
-    }
-});
-
-const ctxUsers = document.getElementById('usersChart').getContext('2d');
-const usersChart = new Chart(ctxUsers, {
-    type: 'doughnut',
-    data: {
-        labels: ['Utilisateurs inscrits', 'Utilisateurs ayant fait une demande'],
-        datasets: [{
-            data: [{{ stats.totalUsers - stats.usersWithDemandes }}, {{ stats.usersWithDemandes }}],
-            backgroundColor: ['rgba(108, 117, 125, 0.6)', 'rgba(25, 135, 84, 0.6)'],
-            borderColor: ['rgba(108, 117, 125, 1)', 'rgba(25, 135, 84, 1)'],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: 'Statistiques utilisateurs' }
-        }
-    }
-});
-</script>
-
-
-<!-- PRESTATIONS PAR CATEGORIE -->
-<div class="chart-container" style="max-width: 600px; margin: 0 auto 2rem;">
-    <canvas id="prestationsChart"></canvas>
-</div>
-
-<script>
-const ctxPrestations = document.getElementById('prestationsChart').getContext('2d');
-const prestationsChart = new Chart(ctxPrestations, {
-    type: 'bar',
-    data: {
-        labels: [{% for cat, nb in stats.prestationsByCategorie %}'{{ cat }}',{% endfor %}],
-        datasets: [{
-            label: 'Nombre de prestations',
-            data: [{% for cat, nb in stats.prestationsByCategorie %}{{ nb }},{% endfor %}],
-            backgroundColor: 'rgba(15, 120, 206, 1)',
-            borderColor: 'rgba(0, 60, 255, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            title: { display: true, text: 'Prestations par catégorie', font: { size: 16 } }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1 }
-            }
-        }
-    }
-});
-</script>
-</div>
-
-<form method="get" action="{{ path('app_admin_demandes') }}" 
-      class="search-form bg-white shadow-sm rounded-4 p-3 p-md-4 mb-4 border animate-fade-in">
-
-    <div class="row g-3 align-items-center">
-        <!-- Champ de recherche -->
-        <div class="col-md-4">
-            <div class="input-group input-hover">
-                <span class="input-group-text bg-light border-0">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input 
-                    type="text" 
-                    name="search" 
-                    class="form-control border-0 shadow-none" 
-                    placeholder="Rechercher par nom ou prénom..." 
-                    value="{{ search }}">
-            </div>
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="title">
+            <h1>Tableau de bord</h1>
+            <small class="last-update">Dernière mise à jour : {{ stats.lastUpdate|date('d/m/Y H:i') }}</small>
         </div>
 
-        <!-- Type de demandeur -->
-        <div class="col-md-3">
-            <div class="input-group input-hover">
-                <span class="input-group-text bg-light border-0">
-                    <i class="bi bi-person-badge"></i>
-                </span>
-                <select name="naturedemandeur" class="form-select border-0 shadow-none">
-                    <option value="">Type de demandeur</option>
-                    {% for type in ['particulier', 'hotel', 'centre de formation', 'hopital/clinique'] %}
-                        <option value="{{ type }}" {% if nature == type %}selected{% endif %}>
-                            {{ type|capitalize }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
+        <div class="header-actions">
+            <a href="{{ path('admin_prestation_new') }}" class="btn btn-sm btn-primary me-2 d-flex align-items-center gap-2">
+                <i class="bi bi-layers"></i> Ajouter une prestation
+            </a>
+            <a href="{{ path('admin_prestation_list') }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2 me-2">
+                <i class="bi bi-list-check"></i> Prestations
+            </a>
 
-        <!-- Statut -->
-        <div class="col-md-3">
-            <div class="input-group input-hover">
-                <span class="input-group-text bg-light border-0">
-                    <i class="bi bi-flag"></i>
-                </span>
-                <select name="statut" class="form-select border-0 shadow-none">
-                    <option value="">Statut</option>
-                    {% for s in ['en attente', 'en cours', 'acceptée', 'refusée', 'annulée'] %}
-                        <option value="{{ s }}" {% if statut == s %}selected{% endif %}>
-                            {{ s|capitalize }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-
-        <!-- Bouton -->
-        <div class="col-md-2 text-end">
-            <button type="submit" 
-                    class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm btn-hover">
-                <i class="bi bi-funnel"></i>
-                <span>Filtrer</span>
+            <button id="open-chat-header" class="btn btn-sm btn-primary d-none d-md-inline">
+                <i class="bi bi-chat-dots-fill"></i> HygieConnect IA
             </button>
         </div>
     </div>
-</form>
 
-<div class="dashboard-container py-5">
-    <!-- TABLEAU DES DEMANDES -->
-    <div class="card border-0 rounded-4 shadow-lg bg-white bg-opacity-75 backdrop-blur p-2">
+    <!-- STAT CARDS -->
+    <section class="stats-cards" aria-label="Statistiques">
+        <div class="stats-card">
+            <h2>{{ stats.total }}</h2>
+            <p>Total des demandes</p>
+        </div>
+        <div class="stats-card">
+            <h2>{{ stats.acceptees }}</h2>
+            <p>Demandes acceptées</p>
+        </div>
+        <div class="stats-card">
+            <h2>{{ stats.refusees }}</h2>
+            <p>Demandes refusées</p>
+        </div>
+        <div class="stats-card">
+            <h2>{{ stats.enCours }}</h2>
+            <p>Demandes en cours</p>
+        </div>
+        <div class="stats-card">
+            <h2>{{ stats.tauxAccept }}%</h2>
+            <p>Taux d'acceptation</p>
+        </div>
+        <div class="stats-card">
+            <h2>{{ stats.tauxAnnule }}%</h2>
+            <p>Taux d'annulation</p>
+        </div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="charts-row" aria-label="Graphiques">
+        <div class="chart-container">
+            <canvas id="statusChart" aria-label="Répartition par statut"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="usersChart" aria-label="Statistiques utilisateurs"></canvas>
+        </div>
+    </section>
+
+    <!-- PRESTATIONS PAR CATEGORIE -->
+    <section class="prestations-wrapper">
+        <div class="chart-container">
+            <canvas id="prestationsChart"></canvas>
+        </div>
+    </section>
+
+    <!-- FILTER / SEARCH FORM -->
+    <form method="get" action="{{ path('app_admin_demandes') }}" class="search-form bg-white shadow-sm rounded-4 p-3 p-md-4 mb-4 border">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-hover">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-0 shadow-none" placeholder="Rechercher par nom ou prénom..." value="{{ search }}">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group input-hover">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-person-badge"></i></span>
+                    <select name="naturedemandeur" class="form-select border-0 shadow-none">
+                        <option value="">Type de demandeur</option>
+                        {% for type in ['particulier', 'hotel', 'centre de formation', 'hopital/clinique'] %}
+                            <option value="{{ type }}" {% if nature == type %}selected{% endif %}>{{ type|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group input-hover">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-flag"></i></span>
+                    <select name="statut" class="form-select border-0 shadow-none">
+                        <option value="">Statut</option>
+                        {% for s in ['en attente', 'en cours', 'acceptée', 'refusée', 'annulée'] %}
+                            <option value="{{ s }}" {% if statut == s %}selected{% endif %}>{{ s|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                    <i class="bi bi-funnel"></i> Filtrer
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- TABLE -->
+    <div class="card-table">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-uppercase small text-secondary">
                     <tr>
                         <th>N°</th>
@@ -319,12 +373,12 @@ const prestationsChart = new Chart(ctxPrestations, {
                 </thead>
                 <tbody>
                 {% for demande in demandes %}
-                    <tr class="hover-row">
+                    <tr>
                         <td>{{ demande.id }}</td>
                         <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
                         <td>
                             {% for prestation in demande.prestations %}
-                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle">
+                                <span class="badge badge-custom text-primary bg-white border border-primary-subtle">
                                     {{ prestation.titre }}
                                 </span>
                             {% endfor %}
@@ -335,7 +389,7 @@ const prestationsChart = new Chart(ctxPrestations, {
                         <td>{{ demande.datedebut ? demande.datedebut|date('d/m/Y') : '-' }}</td>
                         <td>{{ demande.datefin ? demande.datefin|date('d/m/Y') : '-' }}</td>
                         <td>
-                            <span class="badge rounded-pill px-3 py-2 fw-semibold 
+                            <span class="badge rounded-pill px-3 py-2 fw-semibold
                                 {% if demande.statut == 'en attente' %} bg-warning-subtle text-warning border border-warning
                                 {% elseif demande.statut == 'acceptée' %} bg-success-subtle text-success border border-success
                                 {% elseif demande.statut == 'refusée' %} bg-danger-subtle text-danger border border-danger
@@ -369,6 +423,193 @@ const prestationsChart = new Chart(ctxPrestations, {
             </table>
         </div>
     </div>
+
+</div> {# end container-main #}
+
+<!-- ---------- Chat floating FAB + Panel ---------- -->
+<div class="chat-fab" id="chat-fab" role="button" aria-label="Ouvrir le chat">💬</div>
+
+<div class="chat-panel" id="chat-panel" aria-hidden="true">
+    <div class="header">
+        <h5>💬 HygieConnect IA</h5>
+        <div>
+            <button id="chat-close" class="btn btn-sm btn-primary" aria-label="Fermer">✕</button>
+        </div>
+    </div>
+
+    <div class="messages" id="chat-messages" aria-live="polite" aria-atomic="false">
+        <!-- messages injected here -->
+    </div>
+
+    <div class="composer">
+        <input id="chat-input" type="text" placeholder="Pose ta question..." aria-label="Message">
+        <button id="chat-send" class="btn">Envoyer</button>
+    </div>
 </div>
 
+{% block javascripts %}
+{{ parent() }}
+
+<script>
+/* ---------- Wave movement on scroll ---------- */
+(function() {
+    const w1 = document.getElementById('wave1');
+    const w2 = document.getElementById('wave2');
+
+    function updateWaves() {
+        const sc = window.scrollY || window.pageYOffset;
+        // translate waves slightly based on scroll (parallax feel)
+        w1.style.transform = `translateX(${sc * -0.02}px) translateY(${sc * -0.03}px) rotate(${sc * 0.002}deg)`;
+        w2.style.transform = `translateX(${sc * 0.03}px) translateY(${sc * -0.01}px) rotate(${sc * -0.0015}deg)`;
+    }
+
+    window.addEventListener('scroll', updateWaves, {passive:true});
+    window.addEventListener('resize', updateWaves);
+    updateWaves();
+})();
+
+/* ---------- Charts ---------- */
+(function() {
+    // Status chart
+    const statusEl = document.getElementById('statusChart');
+    if (statusEl) {
+        const ctx = statusEl.getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['En Cours', 'Accepté', 'Refusé', 'Annulée'],
+                datasets: [{
+                    data: [{{ stats.enCours }}, {{ stats.acceptees }}, {{ stats.refusees }}, {{ stats.annulees }}],
+                    backgroundColor: ['rgba(21,208,255,1)','rgba(10,125,202,1)','rgba(255,99,132,0.9)','rgba(255,159,64,0.9)'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Répartition des demandes' } } }
+        });
+    }
+
+    // Users chart
+    const usersEl = document.getElementById('usersChart');
+    if (usersEl) {
+        const ctx2 = usersEl.getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Inscrits', 'Avec demandes'],
+                datasets: [{
+                    data: [{{ stats.totalUsers - stats.usersWithDemandes }}, {{ stats.usersWithDemandes }}],
+                    backgroundColor: ['rgba(108,117,125,0.6)', 'rgba(25,135,84,0.6)'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Statistiques utilisateurs' } } }
+        });
+    }
+
+    // Prestations bar
+    const prestEl = document.getElementById('prestationsChart');
+    if (prestEl) {
+        const ctx3 = prestEl.getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: [{% for cat, nb in stats.prestationsByCategorie %}'{{ cat }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Nombre de prestations',
+                    data: [{% for cat, nb in stats.prestationsByCategorie %}{{ nb }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(15,120,206,0.95)',
+                    borderColor: 'rgba(0,60,255,0.9)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false }, title: { display: true, text: 'Prestations par catégorie' } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+})();
+
+/* ---------- Chat: open/close, send, typing ---------- */
+(function(){
+    const fab = document.getElementById('chat-fab');
+    const panel = document.getElementById('chat-panel');
+    const openHeader = document.getElementById('open-chat-header');
+    const closeBtn = document.getElementById('chat-close');
+    const sendBtn = document.getElementById('chat-send');
+    const input = document.getElementById('chat-input');
+    const messages = document.getElementById('chat-messages');
+
+    function openPanel() {
+        panel.classList.add('open');
+        panel.setAttribute('aria-hidden','false');
+        input.focus();
+    }
+    function closePanel() {
+        panel.classList.remove('open');
+        panel.setAttribute('aria-hidden','true');
+    }
+
+    fab.addEventListener('click', openPanel);
+    if (openHeader) openHeader.addEventListener('click', openPanel);
+    closeBtn.addEventListener('click', closePanel);
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+    // helper to append messages
+    function appendMessage(role, html) {
+        const div = document.createElement('div');
+        div.className = 'msg ' + (role === 'user' ? 'user' : 'ia');
+        div.innerHTML = html;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+        return div;
+    }
+
+    let typingNode = null;
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        appendMessage('user', '<strong>Toi :</strong> ' + escapeHtml(text));
+        input.value = '';
+        // show typing
+        typingNode = appendMessage('ia', '<strong>IA :</strong> <span class="typing-dots"><span></span><span></span><span></span></span>');
+
+        try {
+            const res = await fetch('{{ path('chat_ask') is defined ? path('chat_ask') : '/ask' }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await res.json();
+            if (typingNode) typingNode.remove();
+            if (data.response) {
+                appendMessage('ia', '<strong>IA :</strong> ' + escapeHtml(data.response));
+            } else {
+                appendMessage('ia', '<strong>IA :</strong> <span style="color:#c00">Erreur : ' + escapeHtml(data.error || 'Pas de réponse') + '</span>');
+            }
+        } catch (err) {
+            if (typingNode) typingNode.remove();
+            appendMessage('ia', '<strong>IA :</strong> <span style="color:#c00">Erreur réseau</span>');
+            console.error(err);
+        }
+    }
+
+    // small HTML escaper
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+})();
+</script>
+{% endblock %}
 {% endblock %}

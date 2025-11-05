@@ -6,7 +6,6 @@
 {% endblock %}
 {% block body %}
 <style>
-/* === HERO SECTION === */
 .hero {
   background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.35)), 
               url('{{ asset('images/formation.webp') }}') center/cover fixed;
@@ -18,7 +17,7 @@
 }
 </style>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <section class="hero">
   <h1>Nos Guides</h1>
   <p>Manuels pratiques pour la gestion des risques et les bonnes pratiques professionnelles.</p>
@@ -29,43 +28,42 @@
 <section class="container py-5">
   <h2 class="section-title">Qu’est-ce qu’un guide ?</h2>
   <div class="explanation">
-    Un guide est un <strong>manual pratique</strong> qui sert d’outil de gestion des risques.  
-    Il permet de suivre les procédures, d’appliquer les bonnes pratiques et d’améliorer la sécurité et la conformité de vos installations.
+    Un guide est un <strong>manual pratique</strong> servant d’outil de gestion des risques.
+    Il aide à suivre les procédures, à appliquer les bonnes pratiques et à renforcer la sécurité.
   </div>
 </section>
 
-<!-- GUIDES -->
+<!-- GUIDES DYNAMIQUES -->
 <section class="container pb-4">
   <div class="row g-4">
-    {% set guides = [
-      {'titre': 'Mise en place d\'un guide des BPTE spécifique aux installations de l\'établissement', 'jours': 6, 'prix': 250, 'image': 'guide2.png', 'description': 'Guide complet pour la mise en place des Bonnes Pratiques de Traitement et d’Entretien adaptées à votre établissement.'},
-      {'titre': 'Mise à jour du Guide des Bonnes Pratiques de Traitement et d\'Entretien en cas de travaux ou modification des locaux techniques', 'jours': 3, 'prix': 250, 'image': 'guide2.png', 'description': 'Guide pratique pour actualiser vos procédures lors de travaux de rénovation ou de modifications techniques.'}
-    ] %}
-
-    {% for guide in guides %}
-      <div class="col-md-6 col-lg-6 animate-card">
-        <div class="card modern-card h-100">
-          <div class="position-relative">
-            <img src="{{ asset('images/' ~ guide.image) }}" class="card-img-top" alt="{{ guide.titre }}">
-            <div class="badge-container">
-              <span class="badge badge-gradient">{{ guide.jours }} jour{{ guide.jours > 1 ? 's' : '' }}</span>
-              <span class="badge badge-price">{{ guide.prix }} DT</span>
+    {% if guides is empty %}
+      <p class="text-center text-muted">Aucun guide disponible pour le moment.</p>
+    {% else %}
+      {% for guide in guides %}
+        <div class="col-md-6 col-lg-6 animate-card">
+          <div class="card modern-card h-100">
+            <div class="position-relative">
+              <img src="{{ asset('images/' ~ (guide.image ?? 'guide2.png')) }}" class="card-img-top" alt="{{ guide.titre }}">
+              <div class="badge-container">
+                <span class="badge badge-gradient">{{ guide.duree }}</span>
+                <span class="badge badge-price">{{ guide.prix }} DT</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title mt-3">{{ guide.titre }}</h5>
+              <p class="card-description">{{ guide.description }}</p>
             </div>
           </div>
-          <div class="card-body">
-            <h5 class="card-title mt-3">{{ guide.titre }}</h5>
-            <p class="card-description">{{ guide.description }}</p>
-          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
   </div>
 </section>
 
 <!-- FOOTER CTA -->
 <section class="footer-cta">
   <h3>Besoin d’un guide personnalisé ?</h3>
-  <p>Nos experts vous accompagnent pour mettre en place des outils pratiques adaptés à votre établissement.</p>
+  <p>Nos experts vous accompagnent pour créer des outils pratiques adaptés à vos besoins.</p>
   <a href="{{ path('app_demande_new') }}" class="btn">Contactez-nous</a>
 </section>
 

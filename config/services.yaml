@@ -21,9 +21,7 @@ services:
             - "../src/Kernel.php"
 
     # configuration spécifique pour ton service ChatAiService
-    App\Service\ChatAiService:
-        arguments:
-            $apiKey: "%env(OPENAI_API_KEY)%"
+    App\Service\OllamaChatService: ~
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

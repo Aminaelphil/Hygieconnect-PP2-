@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Nos Audits{% endblock %}
+
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/audit.css') }}">
+<link rel="stylesheet" href="{{ asset('css/audit.css') }}">
 {% endblock %}
+
 {% block body %}
 <style>
-/* === HERO SECTION === */
 .hero {
   background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.35)), 
               url('{{ asset('images/back5.jpg') }}') center/cover fixed;
@@ -16,10 +17,9 @@
   position: relative;
   overflow: hidden;
 }
-
 </style>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 <section class="hero">
   <h1>Nos Audits</h1>
   <p>Évaluation complète par notre expert pour maîtriser les risques et améliorer vos pratiques.</p>
@@ -30,37 +30,38 @@
 <section class="container py-5">
   <h2 class="section-title">Qu’est-ce qu’un audit ?</h2>
   <div class="explanation">
-    Un audit est une <strong>vérification et évaluation</strong> réalisée par notre expert.  
-    Il permet d’identifier les risques, de mesurer la conformité et d’attribuer un <strong>score en pourcentage</strong> pour mieux piloter vos installations et pratiques professionnelles.
+    Un audit est une <strong>vérification et évaluation</strong> menée par notre expert.
+    Il permet d’identifier les risques, de mesurer la conformité et de définir un <strong>score en pourcentage</strong>
+    pour piloter efficacement vos installations et vos pratiques professionnelles.
   </div>
 </section>
 
-<!-- AUDITS -->
+<!-- AUDITS DYNAMIQUES -->
 <section class="container pb-4">
   <div class="row g-4">
-    {% set audits = [
-      {'titre': 'Réalisation d\'audit biotechnique relatif à la prévention des légionelles', 'jours': 2, 'prix': 350, 'image': 'formation3.jpg', 'description': 'Évaluation des installations et protocoles pour prévenir les légionelles.'},
-      {'titre': 'Réalisation d\'audit en hygiène alimentaire', 'jours': 2, 'prix': 300, 'image': 'formation2.jpg', 'description': 'Vérification des pratiques alimentaires et respect des normes d’hygiène.'},
-      {'titre': 'Réalisation de diagnostic technique des installations de production et de stockage de l’eau chaude et froide sanitaires et des installations d’air conditionné pour la maîtrise de leurs points critiques', 'jours': '2 à 4', 'prix': 400, 'image': 'formation1.jpg', 'description': 'Analyse complète des installations techniques et maîtrise des points critiques.'}
-    ] %}
+    {% if audits is empty %}
+      <p class="text-center text-muted">Aucun audit disponible pour le moment.</p>
+    {% else %}
+      {% for audit in audits %}
+        <div class="col-md-6 col-lg-4 animate-card">
+          <div class="card modern-card h-100">
+            <div class="position-relative">
+              <img src="{{ asset('images/' ~ (audit.image ?? 'formation3.jpg')) }}" 
+                   class="card-img-top" alt="{{ audit.titre }}">
+              <div class="badge-container">
+                <span class="badge badge-gradient">{{ audit.duree ?? 'Durée non précisée' }}</span>
+                <span class="badge badge-price">{{ audit.prix }} DT</span>
+              </div>
+            </div>
 
-    {% for audit in audits %}
-      <div class="col-md-6 col-lg-4 animate-card">
-        <div class="card modern-card h-100">
-          <div class="position-relative">
-            <img src="{{ asset('images/' ~ audit.image) }}" class="card-img-top" alt="{{ audit.titre }}">
-            <div class="badge-container">
-              <span class="badge badge-gradient">{{ audit.jours }} jour{{ audit.jours|default(1) > 1 ? 's' : '' }}</span>
-              <span class="badge badge-price">{{ audit.prix }} DT</span>
+            <div class="card-body">
+              <h5 class="card-title mt-3">{{ audit.titre }}</h5>
+              <p class="audit-description">{{ audit.description }}</p>
             </div>
           </div>
-          <div class="card-body">
-            <h5 class="card-title mt-3">{{ audit.titre }}</h5>
-            <p class="audit-description">{{ audit.description }}</p>
-          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    {% endif %}
   </div>
 </section>
 
