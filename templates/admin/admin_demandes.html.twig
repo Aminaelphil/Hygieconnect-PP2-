@@ -50,10 +50,11 @@ body {
 
 /* ---------- Container ---------- */
 .container-main {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 48px 20px;
 }
+
 
 /* ---------- Header ---------- */
 .page-header {
@@ -148,6 +149,16 @@ body {
     border-radius: 12px;
     padding: 12px;
     box-shadow: 0 10px 30px rgba(10,20,40,0.06);
+
+    /* AJOUT POUR OCCUPER TOUTE LA LARGEUR */
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
 }
 .table thead th { border-bottom: none; }
 .table tbody tr { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(10,20,40,0.03); transition: transform .12s ease; }
