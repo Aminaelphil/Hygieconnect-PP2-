@@ -98,7 +98,7 @@ public function onAuthenticationSuccess(Request $request, TokenInterface $token,
     }
     //  Si l’utilisateur est un administrateur, on le redirige vers le dashboard
     if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-        return new RedirectResponse($this->urlGenerator->generate('admin'));
+        return new RedirectResponse($this->urlGenerator->generate('app_admin_demandes'));
     }
     // Sinon retour à l’accueil par défaut
     return new RedirectResponse($this->urlGenerator->generate('app_home'));
