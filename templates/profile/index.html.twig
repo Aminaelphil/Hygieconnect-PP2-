@@ -1,8 +1,39 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Mon Profil{% endblock %}
+{% block stylesheets %}
+<style>
+    /* Vagues animées bleu */
+    .wave {
+        position: absolute;
+        width: 200%;
+        height: 100%;
+        left: -50%;
+        top: 0;
+        background: linear-gradient(135deg, #0f76fd 20%, #63a7ff 80%);
+        opacity: 0.3;
+        border-radius: 43% 57% 59% 41% / 36% 42% 58% 64%;
+        animation: waveMove 10s linear infinite;
+        z-index: -1;
+    }
 
+    .wave.wave2 {
+        animation-duration: 15s;
+        background: linear-gradient(135deg, #055ed1 20%, #0f76fd 80%);
+        opacity: 0.25;
+    }
+
+    @keyframes waveMove {
+        0% { transform: translateX(0) translateY(0) rotate(0deg); }
+        50% { transform: translateX(25%) translateY(-10px) rotate(2deg); }
+        100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    }
+
+    </style>
+    {% endblock %}
 {% block body %}
+<div class="wave"></div>
+<div class="wave wave2"></div>
 <div class="container py-5">
 <div class="one">
   <h1>Mon espace</h1>
@@ -24,7 +55,7 @@
                     <a href="{{ path('app_mes_demandes') }}" class="btn btn-primary w-100">
                         Mes demandes
                     </a>
-                    <a href=# class="btn btn-outline-primary w-100">
+                    <a href="{{ path('app_profile_edit') }}" class="btn btn-outline-primary w-100">
                         Modifier mon profil
                     </a>
                 </div>
@@ -95,13 +126,7 @@
 </div>
 
 <style>
-body {
-        background-image: url('{{ asset('images/background1.jpg') }}');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-attachment: fixed;
-    }
+
 
         /* === BASE HEADING === */ 
 

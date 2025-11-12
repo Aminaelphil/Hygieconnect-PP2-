@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+{% block stylesheets %}
+<style>
+    /* Vagues animées bleu */
+    .wave {
+        position: absolute;
+        width: 200%;
+        height: 100%;
+        left: -50%;
+        top: 0;
+        background: linear-gradient(135deg, #0f76fd 20%, #63a7ff 80%);
+        opacity: 0.3;
+        border-radius: 43% 57% 59% 41% / 36% 42% 58% 64%;
+        animation: waveMove 10s linear infinite;
+        z-index: -1;
+    }
+
+    .wave.wave2 {
+        animation-duration: 15s;
+        background: linear-gradient(135deg, #055ed1 20%, #0f76fd 80%);
+        opacity: 0.25;
+    }
+
+    @keyframes waveMove {
+        0% { transform: translateX(0) translateY(0) rotate(0deg); }
+        50% { transform: translateX(25%) translateY(-10px) rotate(2deg); }
+        100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    }
+
+    </style>
+    {% endblock %}
+{% block body %}
+<div class="wave"></div>
+<div class="wave wave2"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4 fw-bold text-primary">
+                        <i class="bi bi-person-lines-fill me-2"></i> Modifier mon profil
+                    </h2>
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                        <div class="mb-3">
+                            {{ form_label(form.nom) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control rounded-3'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.prenom) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control rounded-3'}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.email) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control rounded-3'}}) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_label(form.telephone) }}
+                            {{ form_widget(form.telephone, {'attr': {'class': 'form-control rounded-3'}}) }}
+                            {{ form_errors(form.telephone) }}
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg rounded-3 shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i> Enregistrer
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+
+                    <div class="text-center mt-4">
+                        <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Retour au profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
