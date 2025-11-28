@@ -182,14 +182,18 @@ public function etape5(
     // Récupération des données de l'assistant (wizard)
     $data = $session->get(self::WIZARD_KEY, []);
 
-    // Récupération des prestations sélectionnées
+    // Prestations sélectionnées (entités)
     $selectedPrestations = $data['prestations'] ?? [];
     $prestationsEntities = !empty($selectedPrestations)
         ? $this->prestationRepository->findBy(['id' => $selectedPrestations])
         : [];
 
-    // Calcul du total du devis
+    // Initialisation
     $total = 0;
+    $detailsPrestations = [];
+    $jours = 0;
+
+    // Calcul du nombre de jours + détails par prestation
     if (!empty($data['dateDebut']) && !empty($data['dateFin']) && $prestationsEntities) {
         try {
             $dDeb = new \DateTimeImmutable($data['dateDebut']);
@@ -197,14 +201,24 @@ public function etape5(
             $jours = $dDeb->diff($dFin)->days + 1;
 
             foreach ($prestationsEntities as $p) {
-                $total += ($p->getPrix() ?? 0) * $jours;
+                $prixUnitaire = $p->getPrix() ?? 0;
+                $totalLigne = $prixUnitaire * $jours;
+
+                $detailsPrestations[] = [
+                    'titre' => $p->getTitre(),
+                    'prix_unitaire' => $prixUnitaire,
+                    'jours' => $jours,
+                    'total' => $totalLigne
+                ];
+
+                $total += $totalLigne;
             }
         } catch (\Exception $e) {
             // Ignorer les erreurs de date
         }
     }
 
-    // Création de la demande (sans rattachement utilisateur)
+    // Création de la demande (persistée)
     $demande = new Demande();
     $demande->setDatedemande(new \DateTimeImmutable());
     $demande->setDatedebut(!empty($data['dateDebut']) ? new \DateTimeImmutable($data['dateDebut']) : null);
@@ -226,11 +240,13 @@ public function etape5(
     $data['demande_id'] = $demande->getId();
     $session->set(self::WIZARD_KEY, $data);
 
-    // Génération du numéro de devis
+    // Numéro de devis
     $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
 
-    // Génération du PDF du devis
+    // --- IMPORTANT : on envoie bien detailsPrestations (et aussi prestationsEntities au cas où) ---
     $html = $this->renderView('demande/devis_pdf.html.twig', [
+        'detailsPrestations' => $detailsPrestations,
+        // j'envoie aussi "prestations" pour compatibilité avec d'anciens tpl qui attendent ce nom
         'prestations' => $prestationsEntities,
         'total' => $total,
         'demande' => $demande,
@@ -239,6 +255,7 @@ public function etape5(
         'nom' => $data['etape1']['nom'] ?? null,
         'email' => $data['etape1']['email'] ?? null,
         'telephone' => $data['etape1']['telephone'] ?? null,
+        'jours' => $jours,
     ]);
 
     $options = new Options();
@@ -249,7 +266,7 @@ public function etape5(
     $dompdf->render();
     $pdfContent = $dompdf->output();
 
-    // Envoi du mail avec le devis en pièce jointe
+    // Envoi du mail avec le PDF en pièce jointe
     $email = (new Email())
         ->from(new Address('no-reply@tonsite.com', 'HygieConnect'))
         ->to($data['etape1']['email'])
@@ -263,16 +280,19 @@ public function etape5(
 
     $mailer->send($email);
 
-    // Affichage du récapitulatif avec possibilité de se connecter
+    // Rendu final de la page web (etape5)
     return $this->render('demande/etape5.html.twig', [
+        'detailsPrestations' => $detailsPrestations,
         'prestations' => $prestationsEntities,
         'total' => $total,
         'demande' => $demande,
         'devisNumero' => $devisNumero,
         'stepData' => $data,
+        'jours' => $jours,
         'mailEnvoye' => true,
     ]);
 }
+
 // -------------------------
 // Confirmation de la demande après login
 // -------------------------
@@ -345,41 +365,75 @@ public function confirmer(SessionInterface $session, EntityManagerInterface $em)
         ]);
     }
 
-    // -------------------------
-    // Génération PDF d'une demande
-    // -------------------------
-    #[Route('/demande/devis/pdf/{id}', name: 'app_demande_pdf')]
-    public function generatePdf(Demande $demande): Response
-    {
-        $prestationsEntities = $demande->getPrestations();
-        $total = $demande->getDevisestime();
-        $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
+// -------------------------
+// Génération PDF d'une demande
+// -------------------------
+#[Route('/demande/devis/pdf/{id}', name: 'app_demande_pdf')]
+public function generatePdf(SessionInterface $session, Demande $demande): Response
+{
+    // Récupération des infos de l'utilisateur depuis la session
+    $data = $session->get(self::WIZARD_KEY, []);
+    $etape1 = $data["etape1"] ?? [];
 
-        $html = $this->renderView('demande/devis_pdf.html.twig', [
-            'prestations' => $prestationsEntities,
-            'total' => $total,
-            'demande' => $demande,
-            'devisNumero' => $devisNumero,
-            'isPdf' => true,
-            'nom' => $etape1['nom'] ?? null,
-            'email' => $etape1['email'] ?? null,
-            'telephone' => $etape1['telephone'] ?? null,
-        ]);
+    // Prestations de la demande
+    $prestationsEntities = $demande->getPrestations();
 
-        $options = new Options();
-        $options->set('defaultFont', 'Arial');
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-
-        return new StreamedResponse(function() use ($dompdf) {
-            echo $dompdf->output();
-        }, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="devis.pdf"',
-        ]);
+    // Calcul nombre de jours
+    $jours = 0;
+    if ($demande->getDatedebut() && $demande->getDatefin()) {
+        $jours = $demande->getDatedebut()->diff($demande->getDatefin())->days + 1;
     }
+
+    // Préparer les détails pour le PDF
+    $detailsPrestations = [];
+    $total = 0;
+    foreach ($prestationsEntities as $p) {
+        $prixUnitaire = $p->getPrix() ?? 0;
+        $totalLigne = $prixUnitaire * $jours;
+
+        $detailsPrestations[] = [
+            'titre' => $p->getTitre(),
+            'prix_unitaire' => $prixUnitaire,
+            'jours' => $jours,
+            'total' => $totalLigne,
+        ];
+
+        $total += $totalLigne;
+    }
+
+    // Numéro de devis
+    $devisNumero = 'DEV-' . str_pad($demande->getId(), 5, '0', STR_PAD_LEFT);
+
+    // Génération du HTML pour le PDF
+    $html = $this->renderView('demande/devis_pdf.html.twig', [
+        'prestations' => $prestationsEntities,   // pour compatibilité
+        'detailsPrestations' => $detailsPrestations, // tableau calculé pour Twig
+        'total' => $total,
+        'demande' => $demande,
+        'devisNumero' => $devisNumero,
+        'isPdf' => true,
+        'nom' => $etape1['nom'] ?? null,
+        'email' => $etape1['email'] ?? null,
+        'telephone' => $etape1['telephone'] ?? null,
+        'jours' => $jours,
+    ]);
+
+    $options = new Options();
+    $options->set('defaultFont', 'Arial');
+
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    return new StreamedResponse(function() use ($dompdf) {
+        echo $dompdf->output();
+    }, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="devis.pdf"',
+    ]);
+}
+
     #[Route('/mes-demandes', name: 'app_mes_demandes')]
         public function mesDemandes(EntityManagerInterface $em): Response
         {

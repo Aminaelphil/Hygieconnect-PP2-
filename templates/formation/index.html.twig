@@ -2,7 +2,7 @@
 
 {% block title %}Nos Formations{% endblock %}
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/styleformation.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/formation.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -52,7 +52,7 @@
                    class="card-img-top" alt="{{ formation.titre }}">
               <div class="badge-container">
                 <span class="badge badge-gradient">{{ formation.duree ?? 'Durée non précisée' }}</span>
-                <span class="badge badge-price">{{ formation.prix }} DT</span>
+                <span class="badge badge-price">{{ formation.prix }} DT/jour</span>
               </div>
             </div>
 

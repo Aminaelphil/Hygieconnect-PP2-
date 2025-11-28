@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Étape 5 — Devis estimatif{% endblock %}
-{% block stylesheets %} 
-<link rel="stylesheet" href="{{ asset('css/etape5.css') }}"> 
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/etape5.css') }}">
 {% endblock %}
+
 {% block body %}
 <style>
     body {
@@ -22,7 +23,7 @@
         <h5 class="mb-3">Résumé de votre demande</h5>
         <ul class="list-unstyled">
             <li><strong>Nom :</strong> {{ stepData.etape1.nom }}</li>
-            <li><strong>Prenom :</strong> {{ stepData.etape1.prenom }}</li>
+            <li><strong>Prénom :</strong> {{ stepData.etape1.prenom }}</li>
             <li><strong>Email :</strong> {{ stepData.etape1.email }}</li>
             <li><strong>Téléphone :</strong> {{ stepData.etape1.telephone }}</li>
             <li><strong>Adresse :</strong> {{ stepData.etape1.adresseprestation }}</li>
@@ -32,28 +33,33 @@
         <hr>
 
         <h5 class="mb-3">Prestations sélectionnées :</h5>
-        {% if prestations is not empty %}
+
+        {% if detailsPrestations is not empty %}
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Prestation</th>
-                            <th>Description</th>
-                            <th class="text-end">Prix</th>
+                            <th class="text-end">Prix unitaire (DT)</th>
+                            <th class="text-end">Quantité (jours)</th>
+                            <th class="text-end">Total (DT)</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {% for p in prestations %}
+                        {% for p in detailsPrestations %}
                             <tr>
                                 <td>{{ p.titre }}</td>
-                                <td>{{ p.description }}</td>
-                                <td class="text-end"><span class="badge-prix">{{ p.prix }} DT</span></td>
+                                <td class="text-end">{{ p.prix_unitaire }}</td>
+                                <td class="text-end">{{ p.jours }}</td>
+                                <td class="text-end"><strong>{{ p.total }}</strong></td>
                             </tr>
                         {% endfor %}
                     </tbody>
+
                     <tfoot>
                         <tr>
-                            <td colspan="2" class="text-end">Total estimé :</td>
+                            <td colspan="3" class="text-end"><strong>Total estimé :</strong></td>
                             <td class="text-end"><span class="badge-prix">{{ total }} DT</span></td>
                         </tr>
                     </tfoot>
@@ -66,23 +72,23 @@
         <p class="mt-3 text-muted"><small>Ce devis est valable pendant 30 jours.</small></p>
 
         <!-- Boutons -->
-        <div class="d-flex mt-4">
+        <div class="d-flex mt-4 gap-3">
             <a href="{{ path('app_demande_etape4') }}" class="btn btn-dark">Retour</a>
             <a href="{{ path('app_demande_new') }}" class="btn btn-primary">Recommencer</a>
-        <a href="{{ path('app_demande_pdf', {'id': demande.id}) }}" class="btn btn-dark" target="_blank">Télécharger le devis en PDF</a>
-        {% if app.user %}
-            <!-- L'utilisateur est connecté : bouton pour confirmer -->
-            <form method="post" action="{{ path('app_demande_confirmer') }}">
-                <button type="submit" class="btn btn-success mt-3">Confirmer la demande</button>
-            </form>
-        {% else %}
-            <a href="{{ path('app_login', {'redirectTo': path('app_demande_confirmer')}) }}" class="btn btn-primary mt-3">
-                Se connecter pour confirmer
+            <a href="{{ path('app_demande_pdf', {'id': demande.id}) }}" class="btn btn-dark" target="_blank">
+                Télécharger le devis en PDF
             </a>
 
-        {% endif %}
-
-
+            {% if app.user %}
+                <form method="post" action="{{ path('app_demande_confirmer') }}">
+                    <button type="submit" class="btn btn-success">Confirmer la demande</button>
+                </form>
+            {% else %}
+                <a href="{{ path('app_login', {'redirectTo': path('app_demande_confirmer')}) }}"
+                   class="btn btn-primary">
+                   Se connecter pour confirmer
+                </a>
+            {% endif %}
         </div>
     </div>
 </div>

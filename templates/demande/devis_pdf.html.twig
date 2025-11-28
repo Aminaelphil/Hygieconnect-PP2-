@@ -69,31 +69,35 @@
     <p><strong>Nom :</strong> {{ nom ?? 'Non renseigné' }}</p>
     <p><strong>Email :</strong> {{ email ?? 'Non renseigné' }}</p>
     <p><strong>Téléphone :</strong> {{ telephone ?? 'Non renseigné' }}</p>
+
     <p><strong>Nature du demandeur :</strong> {{ demande.naturedemandeur ?? 'Non renseigné' }}</p>
     <p><strong>Adresse de la prestation :</strong> {{ demande.adresseprestation ?? 'Non renseignée' }}</p>
     <p><strong>Date de début :</strong> 
         {{ demande.dateDebut ? demande.dateDebut|date('d/m/Y') : 'Non renseignée' }}
     </p>
-    <p><strong>Date de fin :</strong> 
+    <p><strong>Date de fin :</strong>
         {{ demande.dateFin ? demande.dateFin|date('d/m/Y') : 'Non renseignée' }}
     </p>
 </div>
 
-{% if prestations is not empty %}
+{% if detailsPrestations is not empty %}
+
     <table class="prestations-table">
         <thead>
             <tr>
                 <th>Prestation</th>
-                <th>Description</th>
-                <th>Prix (DT)</th>
+                <th>Prix unitaire (DT)</th>
+                <th>Quantité (jours)</th>
+                <th>Total (DT)</th>
             </tr>
         </thead>
         <tbody>
-            {% for prestation in prestations %}
+            {% for p in detailsPrestations %}
                 <tr>
-                    <td>{{ prestation.titre }}</td>
-                    <td>{{ prestation.description }}</td>
-                    <td>{{ prestation.prix }}</td>
+                    <td>{{ p.titre }}</td>
+                    <td>{{ p.prix_unitaire }}</td>
+                    <td>{{ p.jours }}</td>
+                    <td><strong>{{ p.total }}</strong></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -101,6 +105,7 @@
 
     <p class="total">Total estimé : {{ total }} DT</p>
     <p>Ce devis a une validité de 30 jours.</p>
+
 {% else %}
     <p>Aucune prestation sélectionnée.</p>
 {% endif %}

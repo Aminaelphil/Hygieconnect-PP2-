@@ -92,13 +92,14 @@ body {
     align-items:center;
 }
 
-/* ---------- Stat cards ---------- */
+/* ---------- Stat cards avec icônes ---------- */
 .stats-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 16px;
     margin-bottom: 22px;
 }
+
 .stats-card {
     background: var(--glass);
     backdrop-filter: blur(8px);
@@ -107,32 +108,102 @@ body {
     box-shadow: 0 6px 18px rgba(10,20,40,0.06);
     text-align: center;
     transition: transform .18s ease, box-shadow .18s ease;
+    position: relative;
+    overflow: hidden;
 }
-.stats-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(10,20,40,0.09); }
-.stats-card h2 { margin:0; font-size:1.6rem; color: var(--primary-600); font-weight:700; }
-.stats-card p { margin:6px 0 0; color:#4b5563; font-size:0.92rem; }
+
+.stats-card:hover { 
+    transform: translateY(-6px); 
+    box-shadow: 0 12px 30px rgba(10,20,40,0.09); 
+}
+
+.stats-card h2 { 
+    margin: 10px 0 0; 
+    font-size: 1.6rem; 
+    color: var(--primary-600); 
+    font-weight: 700; 
+}
+
+.stats-card p { 
+    margin: 6px 0 0; 
+    color: #4b5563; 
+    font-size: 0.92rem; 
+}
+
+/* Icône en haut de la carte */
+.stats-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 12px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-600));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.1) rotate(5deg);
+}
 
 /* ---------- Charts layout ---------- */
 .charts-row {
-    display:flex;
-    gap: 18px;
+    display: flex;
+    gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 20px;
+    justify-content: center; /* Centre les graphiques */
 }
+
 .chart-container {
-    flex: 1 1 380px;
-    min-width: 300px;
+    flex: 0 1 auto; /* Ne s'étire pas, taille naturelle */
+    width: 500px; /* Augmenté à 500px */
+    max-width: 550px; /* Augmenté à 550px */
+    min-width: 350px; /* Largeur minimale pour mobile */
     background: var(--glass);
     backdrop-filter: blur(8px);
     border-radius: 12px;
-    padding: 16px;
+    padding: 20px; /* Augmenté le padding */
     box-shadow: 0 6px 18px rgba(10,20,40,0.06);
+}
+
+/* NOUVEAU: Limiter la hauteur des canvas des petits graphiques */
+.charts-row .chart-container canvas {
+    max-height: 420px; /* Augmenté à 420px */
+    width: 100% !important; /* Force la largeur responsive */
+    height: auto !important; /* Hauteur automatique */
 }
 
 /* ---------- Prestations chart block ---------- */
 .prestations-wrapper {
     max-width: 720px;
     margin: 0 auto 28px;
+}
+
+/* responsive adjustments */
+@media (max-width: 900px) {
+    .chat-panel { 
+        right: 12px; 
+        left: 12px; 
+        bottom: 90px; 
+        width: auto; 
+        height: 60vh; 
+    }
+    .charts-row { 
+        flex-direction: column; 
+    }
+    .chart-container {
+        max-width: 100%; /* Sur mobile, permet la largeur complète */
+    }
+    .page-header { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 8px; 
+    }
 }
 
 /* ---------- Search / filter form ---------- */
@@ -277,33 +348,56 @@ body {
         </div>
     </div>
 
-    <!-- STAT CARDS -->
-    <section class="stats-cards" aria-label="Statistiques">
-        <div class="stats-card">
-            <h2>{{ stats.total }}</h2>
-            <p>Total des demandes</p>
+ <!-- STAT CARDS avec icônes -->
+<section class="stats-cards" aria-label="Statistiques">
+    <div class="stats-card">
+        <div class="stats-icon">
+            <i class="bi bi-file-earmark-text"></i>
         </div>
-        <div class="stats-card">
-            <h2>{{ stats.acceptees }}</h2>
-            <p>Demandes acceptées</p>
+        <h2>{{ stats.total }}</h2>
+        <p>Total des demandes</p>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon stats-icon-success">
+            <i class="bi bi-check-circle-fill"></i>
         </div>
-        <div class="stats-card">
-            <h2>{{ stats.refusees }}</h2>
-            <p>Demandes refusées</p>
+        <h2>{{ stats.acceptees }}</h2>
+        <p>Demandes acceptées</p>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon stats-icon-danger">
+            <i class="bi bi-x-circle-fill"></i>
         </div>
-        <div class="stats-card">
-            <h2>{{ stats.enCours }}</h2>
-            <p>Demandes en cours</p>
+        <h2>{{ stats.refusees }}</h2>
+        <p>Demandes refusées</p>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon stats-icon-info">
+            <i class="bi bi-clock-history"></i>
         </div>
-        <div class="stats-card">
-            <h2>{{ stats.tauxAccept }}%</h2>
-            <p>Taux d'acceptation</p>
+        <h2>{{ stats.enCours }}</h2>
+        <p>Demandes en cours</p>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon stats-icon-purple">
+            <i class="bi bi-graph-up-arrow"></i>
         </div>
-        <div class="stats-card">
-            <h2>{{ stats.tauxAnnule }}%</h2>
-            <p>Taux d'annulation</p>
+        <h2>{{ stats.tauxAccept }}%</h2>
+        <p>Taux d'acceptation</p>
+    </div>
+    
+    <div class="stats-card">
+        <div class="stats-icon stats-icon-warning">
+            <i class="bi bi-graph-down-arrow"></i>
         </div>
-    </section>
+        <h2>{{ stats.tauxAnnule }}%</h2>
+        <p>Taux d'annulation</p>
+    </div>
+</section>
 
     <!-- CHARTS -->
     <section class="charts-row" aria-label="Graphiques">
@@ -386,14 +480,31 @@ body {
                 {% for demande in demandes %}
                     <tr>
                         <td>{{ demande.id }}</td>
-                        <td>{{ demande.user.nom }} {{ demande.user.prenom }}</td>
-                        <td>
-                            {% for prestation in demande.prestations %}
-                                <span class="badge badge-custom text-primary bg-white border border-primary-subtle">
-                                    {{ prestation.titre }}
-                                </span>
-                            {% endfor %}
+                       <td>{% if demande.user is defined and demande.user%}
+                       {{ demande.user.nom }} {{ demande.user.prenom }}
+                        {% else %}
+                        Pas d'utilisateur
+                        {% endif %}
                         </td>
+                    <td>
+                        {% set prestations_titres = [] %}
+                        {% for prestation in demande.prestations %}
+                            {% set prestations_titres = prestations_titres|merge([prestation.titre]) %}
+                        {% endfor %}
+
+                        {% if prestations_titres|length > 0 %}
+                            <!-- Bouton pour afficher les prestations -->
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    data-bs-toggle="popover"
+                                    data-bs-html="true"
+                                    data-bs-content="{{ prestations_titres|join('<br>') }}">
+                                Voir Prestations
+                            </button>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                         <td>{{ demande.naturedemandeur }}</td>
                         <td>{{ demande.adresseprestation }}</td>
                         <td>{{ demande.datedemande ? demande.datedemande|date('d/m/Y') : '' }}</td>
@@ -622,5 +733,14 @@ body {
 
 })();
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl)
+        })
+    });
+</script>
+
 {% endblock %}
 {% endblock %}
