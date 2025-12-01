@@ -16,8 +16,11 @@ class PrestationController extends AbstractController
     #[Route('/new', name: 'admin_prestation_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
-        $prestation = new Prestation();
-        $form = $this->createForm(PrestationType::class, $prestation);
+    $prestation = new Prestation();
+    $form = $this->createForm(PrestationType::class, $prestation);
+    
+    // Retirer le champ token
+    $form->remove('token');
 
         $form->handleRequest($request);
 

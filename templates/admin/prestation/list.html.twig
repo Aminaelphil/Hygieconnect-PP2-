@@ -3,212 +3,820 @@
 {% block title %}Liste des prestations{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="one">
-                <h1>Liste des prestations</h1>
-             </div>
-        <a href="{{ path('admin_prestation_new') }}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg"></i> Ajouter une prestation
-        </a>
-    </div>
-
-    <!-- Barre de recherche -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Rechercher une prestation...">
+<div class="prestations-wrapper">
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item">Dashboard</span>
+            <i class="bi bi-chevron-right"></i>
+            <span class="breadcrumb-item active">Prestations</span>
         </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="bi bi-sun-fill sun-icon"></i>
+            <i class="bi bi-moon-stars-fill moon-icon"></i>
+        </button>
     </div>
 
-    <!-- Tableau dans une carte -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table align-middle mb-0" id="prestationsTable">
-                    <thead class="bg-primary text-white">
-                        <tr>
-                            <th class="text-center">ID</th>
-                            <th>Titre</th>
-                            <th>Catégorie</th>
-                            <th>Prix</th>
-                            <th>Durée</th>
-                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for prestation in prestations %}
-                        <tr class="table-row-hover">
-                            <td class="text-center">{{ prestation.id }}</td>
-                            <td>{{ prestation.titre }}</td>
-                            <td><span class="badge bg-info text-dark">{{ prestation.categorie.nom }}</span></td>
-                            <td>{{ prestation.prix|number_format(2, '.', ',') }} DT</td>
-                            <td>{{ prestation.duree }}</td>
-                          
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-3">
-                                Aucune prestation trouvée.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Main Content -->
+    <div class="content-grid">
+        <!-- Left Section: Header + Search -->
+        <div class="left-section">
+            <div class="page-header">
+                <h1>Prestations</h1>
+                <p class="subtitle">Gérez vos services et formations</p>
+            </div>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher...">
+                <div class="search-line"></div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon formations">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Formations</span>
+                        <span class="stat-value">7</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon guides">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Guides</span>
+                        <span class="stat-value">4</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon audits">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Audits</span>
+                        <span class="stat-value">3</span>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Right Section: Action Button -->
+        <div class="right-section">
+            <a href="{{ path('admin_prestation_new') }}" class="create-btn">
+                <span>Créer</span>
+                <i class="bi bi-plus-lg"></i>
+            </a>
+        </div>
     </div>
 
-    <!-- Pagination simple -->
-    <nav aria-label="Page navigation" class="mt-3">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
-        </ul>
-    </nav>
+    <!-- Data Table -->
+    <div class="data-table">
+        <table id="prestationsTable">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">
+                        <span class="th-content">ID</span>
+                    </th>
+                    <th>
+                        <span class="th-content">Titre de la prestation</span>
+                    </th>
+                    <th style="width: 140px;">
+                        <span class="th-content">Catégorie</span>
+                    </th>
+                    <th style="width: 120px;">
+                        <span class="th-content">Prix</span>
+                    </th>
+                    <th style="width: 150px;">
+                        <span class="th-content">Durée</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prestation in prestations %}
+                <tr>
+                    <td>
+                        <span class="id-badge">#{{ prestation.id }}</span>
+                    </td>
+                    <td>
+                        <span class="title-text">{{ prestation.titre }}</span>
+                    </td>
+                    <td>
+                        <span class="tag tag-{{ prestation.categorie.nom|lower }}">
+                            {{ prestation.categorie.nom }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="price">{{ prestation.prix|number_format(2, '.', ',') }} DT</span>
+                    </td>
+                    <td>
+                        <span class="duration">
+                            <i class="bi bi-clock"></i>
+                            {{ prestation.duree }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="no-data">
+                        <i class="bi bi-inbox"></i>
+                        <p>Aucune prestation disponible</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button class="page-btn" disabled>
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div class="page-numbers">
+            <button class="page-num active">1</button>
+            <button class="page-num">2</button>
+            <button class="page-num">3</button>
+        </div>
+        <button class="page-btn">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    </div>
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
-        background-image: url('{{ asset('images/background7.jpg') }}');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-attachment: fixed;
-        font-family: "Segoe UI", Roboto, sans-serif;
+        font-family: 'Inter', sans-serif;
+        background: #0a0e27;
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* === BASE HEADING === */ 
+    /* Light Mode */
+    body.light-mode {
+        background: #f8fafc;
+        color: #1e293b;
+    }
 
-h1 {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  font-family: "Raleway", sans-serif;
-  font-weight: 300;
-  font-size: 40px;
-  color: #080808;
-  -webkit-transition: all 0.4s ease 0s;
-  -o-transition: all 0.4s ease 0s;
-  transition: all 0.4s ease 0s;
-}
+    body.light-mode .breadcrumb {
+        color: #64748b;
+    }
 
-h1 span {
-  display: block;
-  font-size: 0.5em;
-  line-height: 1.3;
-}
-h1 em {
-  font-style: normal;
-  font-weight: 600;
-}
+    body.light-mode .breadcrumb-item.active {
+        color: #3b82f6;
+    }
 
-/* === HEADING STYLE #1 === */
-.one h1 {
-  text-align: center;
-  text-transform: uppercase;
-  padding-bottom: 5px;
-}
-.one h1:before {
-  width: 28px;
-  height: 5px;
-  display: block;
-  content: "";
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  margin-left: -14px;
-  background-color: #1b5ef0ff;
-}
-.one h1:after {
-  width: 100px;
-  height: 1px;
-  display: block;
-  content: "";
-  position: relative;
-  margin-top: 25px;
-  left: 50%;
-  margin-left: -50px;
-  background-color: #083ccaff;
-}
+    body.light-mode .page-header h1 {
+        background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-    .table-row-hover {
-        transition: all 0.3s ease-in-out;
+    body.light-mode .subtitle {
+        color: #64748b;
+    }
+
+    body.light-mode .search-box i {
+        color: #94a3b8;
+    }
+
+    body.light-mode .search-box input {
+        color: #1e293b;
+        border-bottom-color: #e2e8f0;
+    }
+
+    body.light-mode .search-box input:focus {
+        border-bottom-color: #3b82f6;
+    }
+
+    body.light-mode .search-box input::placeholder {
+        color: #94a3b8;
+    }
+
+    body.light-mode .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .stat-card:hover {
+        background: #ffffff;
+        border-color: rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+
+    body.light-mode .stat-label {
+        color: #64748b;
+    }
+
+    body.light-mode .stat-value {
+        color: #1e293b;
+    }
+
+    body.light-mode .data-table {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode thead {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    body.light-mode .th-content {
+        color: #64748b;
+    }
+
+    body.light-mode tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    body.light-mode tbody tr:hover {
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    body.light-mode .id-badge {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    body.light-mode .title-text {
+        color: #1e293b;
+    }
+
+    body.light-mode .price {
+        color: #1e293b;
+    }
+
+    body.light-mode .duration {
+        color: #64748b;
+    }
+
+    body.light-mode .no-data {
+        color: #94a3b8;
+    }
+
+    body.light-mode .page-btn,
+    body.light-mode .page-num {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    body.light-mode .page-btn:hover:not(:disabled),
+    body.light-mode .page-num:hover {
+        background: rgba(59, 130, 246, 0.05);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: #3b82f6;
+    }
+
+    body.light-mode .page-num.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    .prestations-wrapper {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Top Bar */
+    .top-bar {
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+        position: relative;
+        width: 60px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
         cursor: pointer;
-    }
-
-    .table-row-hover:hover {
-        background-color: rgba(13, 110, 253, 0.08);
-        transform: scale(1.01);
-    }
-
-    .table th, .table td {
-        vertical-align: middle;
-    }
-
-    .card {
-        border-radius: 12px;
+        transition: all 0.3s ease;
         overflow: hidden;
     }
 
-    .badge {
-        font-size: 0.85rem;
-        padding: 0.35em 0.6em;
-        border-radius: 8px;
+    body.light-mode .theme-toggle {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.2);
     }
 
-    /* Boutons d'action */
-    .btn-info {
-        background-color: #103cffff;
-        border-color: #0d6efd;
-        transition: all 0.2s;
-    }
-    .btn-info:hover {
-        background-color: #0b5ed7;
-        border-color: #0a58ca;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        transition: all 0.2s;
-    }
-    .btn-danger:hover {
-        background-color: #bb2d3b;
-        border-color: #b02a37;
+    .theme-toggle::before {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-radius: 50%;
+        transition: transform 0.3s ease;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
     }
 
-    /* Input recherche */
-    #searchInput {
+    body.light-mode .theme-toggle::before {
+        transform: translateX(28px);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+    }
+
+    .theme-toggle i {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        transition: opacity 0.3s ease;
+    }
+
+    .sun-icon {
+        left: 8px;
+        color: #fbbf24;
+        opacity: 0;
+    }
+
+    .moon-icon {
+        right: 8px;
+        color: #60a5fa;
+        opacity: 1;
+    }
+
+    body.light-mode .sun-icon {
+        opacity: 1;
+    }
+
+    body.light-mode .moon-icon {
+        opacity: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .breadcrumb-item.active {
+        color: #3b82f6;
+        font-weight: 500;
+    }
+
+    .breadcrumb i {
+        font-size: 0.75rem;
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        align-items: start;
+    }
+
+    .left-section {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* Page Header */
+    .page-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #ffffff 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .subtitle {
+        color: #9ca3af;
+        font-size: 1.1rem;
+    }
+
+    /* Search Box */
+    .search-box {
+        position: relative;
+        max-width: 500px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.25rem;
+        color: #6b7280;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 1rem 0 1rem 2.5rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid #1e293b;
+        color: #ffffff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-bottom-color: #3b82f6;
+    }
+
+    .search-box input::placeholder {
+        color: #6b7280;
+    }
+
+    .search-line {
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        transition: width 0.3s ease;
+    }
+
+    .search-box input:focus ~ .search-line {
+        width: 100%;
+    }
+
+    /* Stats Row */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        max-width: 600px;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(59, 130, 246, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon.formations {
+        background: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+    }
+
+    .stat-icon.guides {
+        background: rgba(139, 92, 246, 0.15);
+        color: #8b5cf6;
+    }
+
+    .stat-icon.audits {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+    }
+
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    /* Create Button */
+    .create-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .create-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+        color: white;
+    }
+
+    .create-btn i {
+        font-size: 1.25rem;
+    }
+
+    /* Data Table */
+    .data-table {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    th {
+        padding: 1.25rem 1.5rem;
+        text-align: left;
+    }
+
+    .th-content {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    td {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .id-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #9ca3af;
+    }
+
+    .title-text {
+        color: #ffffff;
+        font-weight: 500;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 0.4rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .tag-formation {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .tag-guide {
+        background: rgba(139, 92, 246, 0.15);
+        color: #a78bfa;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .tag-audit {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .price {
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .duration {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #9ca3af;
+        font-size: 0.9rem;
+    }
+
+    .duration i {
+        font-size: 0.9rem;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 4rem 2rem !important;
+        color: #6b7280;
+    }
+
+    .no-data i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.3;
     }
 
     /* Pagination */
-    .pagination .page-link {
-        color: #0d6efd;
-        border-radius: 8px;
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
     }
-    .pagination .page-item.active .page-link {
-        background-color: #0d6efd;
-        border-color: #0d6efd;
-        color: #fff;
+
+    .page-numbers {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .page-btn, .page-num {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        color: #9ca3af;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+    .page-btn:hover:not(:disabled), .page-num:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.3);
+        color: #3b82f6;
+    }
+
+    .page-num.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .right-section {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .data-table {
+            overflow-x: auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .prestations-wrapper {
+            padding: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+
+        table {
+            min-width: 800px;
+        }
     }
 </style>
 
 <script>
-    // Recherche instantanée
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    
+    // Check for saved theme preference or default to dark
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    if (currentTheme === 'light') {
+        body.classList.add('light-mode');
+    }
+    
+    themeToggle.addEventListener('click', function() {
+        body.classList.toggle('light-mode');
+        
+        // Save theme preference
+        const theme = body.classList.contains('light-mode') ? 'light' : 'dark';
+        localStorage.setItem('theme', theme);
+    });
+
+    // Recherche avec effet
     const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('keyup', function() {
-        const filter = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll('#prestationsTable tbody tr');
-        rows.forEach(row => {
+    const tableRows = document.querySelectorAll('#prestationsTable tbody tr');
+    
+    searchInput.addEventListener('input', function() {
+        const filter = this.value.toLowerCase().trim();
+        
+        tableRows.forEach(row => {
+            if (row.querySelector('.no-data')) return;
+            
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
+            const shouldShow = text.includes(filter);
+            
+            row.style.display = shouldShow ? '' : 'none';
+            
+            if (shouldShow) {
+                row.style.animation = 'slideIn 0.3s ease';
+            }
         });
     });
+
+    // Animation
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    `;
+    document.head.appendChild(styleSheet);
 </script>
 {% endblock %}
